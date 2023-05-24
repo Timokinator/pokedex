@@ -1,9 +1,24 @@
-let currentPokemon;
-let currentPokemonId;
-let imgCurrentPokemon;
+const backgroundColorCanvas = [
+    'rgba(255, 99, 132, 0.2)',
+    'rgba(255, 159, 64, 0.2)',
+    'rgba(255, 205, 86, 0.2)',
+    'rgba(75, 192, 192, 0.2)',
+    'rgba(54, 162, 235, 0.2)',
+    'rgba(153, 102, 255, 0.2)',
+    'rgba(201, 203, 207, 0.2)'
+];
+
+const borderColorCanvas = [
+    'rgb(255, 99, 132)',
+    'rgb(255, 159, 64)',
+    'rgb(255, 205, 86)',
+    'rgb(75, 192, 192)',
+    'rgb(54, 162, 235)',
+    'rgb(153, 102, 255)',
+    'rgb(201, 203, 207)'
+];
 
 let loadedPokemons = [];
-
 
 
 async function loadPokemon() {
@@ -18,8 +33,6 @@ async function loadPokemon() {
         let responseDescription = await fetch(url_description)
         let responseDescriptionAsJson = await responseDescription.json();
 
-        let url_types = ``
-
         let name = responseAsJson['forms'][0]['name'];
         let id = responseAsJson['id'];
         let img = responseAsJson['sprites']['other']['official-artwork']['front_default'];
@@ -31,9 +44,7 @@ async function loadPokemon() {
         let speed = responseAsJson['stats'][5]['base_stat'];
         let types = [];
         let weight = responseAsJson['weight'];
-
-
-
+        let height = responseAsJson['height'];
 
         for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
             let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
@@ -42,39 +53,17 @@ async function loadPokemon() {
             };
         };
 
-
         for (let t = 0; t < responseAsJson['types'].length; t++) {
             const element = responseAsJson['types'][t];
             types.push(element['type']['name']);
         };
-
-
-
-        console.log(name);
-        console.log(id);
-        console.log(img);
-        console.log(hp);
-        console.log(attack);
-        console.log(defense);
-        console.log(special_attack);
-        console.log(special_defense);
-        console.log(speed);
-        console.log(types);
-        console.log(weight);
-        console.log(description);
-
-        pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, description, types);
-
+        pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types);
     };
-
     renderPokemonInfo();
 };
 
 
-
-
-function pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, description, types) {
-
+function pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types) {
     loadedPokemons.push(
         {
             'name': name,
@@ -88,6 +77,7 @@ function pushToJson(i, name, id, img, hp, attack, defense, special_attack, speci
             'speed': speed,
             'types': types,
             'weight': weight,
+            'height': height,
             'i': i,
             'description': description
         }
@@ -95,23 +85,14 @@ function pushToJson(i, name, id, img, hp, attack, defense, special_attack, speci
 };
 
 
-
 function renderPokemonInfo() {
     const content = document.getElementById('pokedex');
     content.innerHTML = '';
 
     for (let i = 0; i < loadedPokemons.length; i++) {
-        const loadedPokemon = loadedPokemons[i];
-
         content.innerHTML += templatePokemonCard(i);
-
-
-
-    }
-
-
-}
-
+    };
+};
 
 
 function templatePokemonCard(i) {
@@ -131,37 +112,195 @@ function templatePokemonCard(i) {
                 </div>
             </div>
         </div>
-
-
-    `
+    `;
 };
 
 
 function insertTypes(i) {
     if (loadedPokemons[i]['types'].length == 1) {
-        return /*html*/`
-        <div class="type_container">
-            <p class="${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
-        </div>`
+        return oneType(i);
     } else if (loadedPokemons[i]['types'].length == 2) {
-        return /*html*/`
-        <div class="type_container">
-            <p class="${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
-            <p class="${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
-        </div>`
+        return twoTypes(i);
     } else if (loadedPokemons[i]['types'].length == 3) {
-        return /*html*/`
-        <div class="type_container">    
-            <p class="${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
-            <p class="${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
-            <p class="${loadedPokemons[i]['types'][2]}">${loadedPokemons[i]['types'][3]}</p>
-        </div>`
+        return threeTypes(i);
     };
 };
 
 
+function oneType(i) {
+    return /*html*/`
+    <div class="type_container">
+        <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
+    </div>`
+};
+
+
+function twoTypes(i) {
+    return /*html*/`
+    <div class="type_container">
+        <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
+        <p class="type ${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
+    </div>`
+};
+
+
+function threeTypes(i) {
+    return /*html*/`
+    <div class="type_container">    
+        <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
+        <p class="type ${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
+        <p class="type ${loadedPokemons[i]['types'][2]}">${loadedPokemons[i]['types'][3]}</p>
+    </div>`
+};
+
+
 function showDetails(i) {
-    alert(`working! ${i}`)
+    const content = document.getElementById('singlePokemon');
+    content.innerHTML = '';
+    content.classList.remove('d-none');
+    content.innerHTML = templateDetails(i);
+    addCloseWithEscape();
+    createCanvas(i);
+};
 
 
-}
+function addCloseWithEscape() {
+    window.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeDetails();
+        }
+    });
+};
+
+
+function templateDetails(i) {
+    return /*html*/`
+<div class="container-single-pokemon card-width-detail">
+   <div onclick="doNotClose(event)" class="card mb-2 border-none " style="margin: 0">
+      <div class="row g-0">
+         <div class="col-sm-4 ${loadedPokemons[i]['types'][0]} card-body-details">
+            <img src="${loadedPokemons[i]['img']}" class="img-fluid rounded-start" alt="...">
+         </div>
+         <div class="col-sm-8 card-detail-right">
+            <div class="card-body">
+               <div class="card_headline_details">
+                  <div class="types-details">
+                     <h5 class="card-title">${loadedPokemons[i]['name'].slice(0, 1).toUpperCase()}${loadedPokemons[i]['name'].slice(1)}</h5>
+                     ${insertTypes(i)}
+                  </div>
+                  <p># ${loadedPokemons[i]['id']}</p>
+               </div>
+               <div class="details-right-bottom">
+
+                    <div class="sizes">
+                        <p>Weight: ${loadedPokemons[i]['weight'] / 10} kg</p>
+                        <p>Height: ${loadedPokemons[i]['height'] / 10} m</p>
+                    </div>
+
+                    <div class="stats">
+                        <canvas id="myChart"></canvas>
+                    </div>
+
+
+
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
+
+   <div class="btn-container-detail">
+      <button class="btn-detail hover-effect ${loadedPokemons[i]['types'][0]}" onclick="previousPokemon(${i}); onclick=doNotClose(event)"><-</button>
+      <button class="btn-detail hover-effect ${loadedPokemons[i]['types'][0]}" onclick="nextPokemon(${i}); onclick=doNotClose(event)">-></button>
+   </div>
+</div>
+`;
+};
+
+
+function previousPokemon(i) {
+    if (i == 0) {
+        i = loadedPokemons.length - 1;
+    } else {
+        i--;
+    };
+    showDetails(i);
+};
+
+
+function nextPokemon(i) {
+    if (i == loadedPokemons.length - 1) {
+        i = 0;
+    } else {
+        i++;
+    };
+    showDetails(i);
+};
+
+
+function closeDetails() {
+    const content = document.getElementById('singlePokemon');
+    content.innerHTML = '';
+    content.classList.add('d-none');
+};
+
+
+function doNotClose(event) {
+    event.stopPropagation();
+};
+
+
+function createCanvas(i) {
+    const ctx = document.getElementById('myChart');
+
+    let hp = loadedPokemons[i]['hp'];
+    let attack = loadedPokemons[i]['attack'];
+    let defense = loadedPokemons[i]['defense'];
+    let special_attack = loadedPokemons[i]['special_attack'];
+    let special_defense = loadedPokemons[i]['special_defense'];
+    let speed = loadedPokemons[i]['speed'];
+
+    newChart(ctx, hp, attack, defense, special_attack, special_defense, speed);
+};
+
+
+function newChart(ctx, hp, attack, defense, special_attack, special_defense, speed) {
+    Chart.defaults.font.size = 10;
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['HP', 'ATTACK', 'DEFENSE', 'SPECIAL-ATTACK', 'SPECIAL-DEFENSE', 'SPEED'],
+            datasets: [{
+                label: '',
+                data: [hp, attack, defense, special_attack, special_defense, speed],
+                backgroundColor: backgroundColorCanvas,
+                borderColor: borderColorCanvas,
+                borderWidth: 1
+            }]
+        },
+        options: optionsCanvas(),
+    });
+};
+
+
+function optionsCanvas() {
+    return {
+        scales: {
+            y: {
+                beginAtZero: true,
+            }
+        },
+        responsive: true,
+        maintainAspectRatio: true,
+        aspectRatio: 2/1.2,
+        indexAxis: 'y',
+        plugins: {
+            legend: {
+                display: false,
+            }
+        }
+    }
+};
+
+

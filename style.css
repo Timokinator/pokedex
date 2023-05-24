@@ -1,14 +1,17 @@
 body {
     margin: 0;
+    background-color: rgb(162, 162, 162);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 
 #pokedex {
     min-height: 50vh;
-    background-color: rgb(162, 162, 162);
     color: white;
     display: flex;
-    padding: 24px;
+    max-width: 99%;
 }
 
 .info-container {
@@ -30,14 +33,36 @@ body {
     border-top: 1px solid black;
 }
 
+.card_headline_details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    border-bottom: 1px solid black;
+    padding-bottom: 8px;
+}
+
+.types-details {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+
 .type_container {
     display: flex;
     justify-content: flex-start;
     gap: 8px;
+    margin-bottom: 16px;
 }
 
 .type {
-    font-size: 16px;
+    padding: 4px;
+    border-radius: 12px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 0;
 }
 
 .card-body {
@@ -48,6 +73,93 @@ body {
     border-bottom-right-radius: var(--bs-border-radius);
 }
 
+.card-body-details {
+    border-radius: var(--bs-border-radius);
+    display: flex;
+    align-items: center;
+}
+
+.single-pokemon {
+    background-color: rgba(0, 0, 0, 0.7);
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.container-single-pokemon {
+    max-height: 100%;
+}
+
+.card-width-detail {
+    width: 90%;
+}
+
+.btn-container-detail {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 64px;
+    margin-top: 4%;
+    margin-left: 8%;
+    margin-right: 8%;
+    font-size: 24px;
+}
+
+.btn-container-detail button {
+    padding: 8px;
+    width: 64px;
+    aspect-ratio: 1 / 1;
+}
+
+.btn-detail {
+    border-radius: 5px;
+}
+
+footer {
+    font-size: 12px;
+    border-top: 1px solid grey;
+    text-align: center;
+    height: 40px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.border-none {
+    border: none;
+}
+
+.card-detail-right p {
+    margin: 0;
+}
+
+.card-detail-right h5 {
+    margin: 0;
+}
+
+.card-detail-right .type_container {
+    margin: 0;
+}
+
+.sizes {
+    display: flex;
+    justify-content: flex-start;
+    gap: 24px;
+}
+
+.stats {
+    width: 100%;
+    aspect-ratio: 2/1.2;
+    position: relative;
+}
 
 
 
