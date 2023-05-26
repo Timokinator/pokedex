@@ -23,24 +23,15 @@ let loadedPokemons = [];
 
 async function loadPokemon() {
 
-    for (let i = 1; i < 151; i++) {
+    for (let i = 1; i < 21; i++) {
 
-        let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
+        let url = `https://pokeapi.co/api/v2/pokemon/${i}`
         let response = await fetch(url);
         let responseAsJson = await response.json();
 
-        let url_description = `https://pokeapi.co/api/v2/pokemon-species/${i}/`;
-        let responseDescription = await fetch(url_description);
+        let url_description = `https://pokeapi.co/api/v2/pokemon-species/${i}/`
+        let responseDescription = await fetch(url_description)
         let responseDescriptionAsJson = await responseDescription.json();
-
-        let url_evolutionChain = responseDescriptionAsJson['evolution_chain']['url'];
-        let responseEvolutionChain = await fetch(url_evolutionChain);
-        let responseEvolutionChainAsJson = await responseEvolutionChain.json();
-
-        let urlFirstEvolution = responseEvolutionChainAsJson['chain']['species']['url'];
-        let responseFirstEvolution = await fetch(urlFirstEvolution);
-        let responseFirstEvolutionAsJson = await responseFirstEvolution.json();
-        let id_first_evolution = responseFirstEvolutionAsJson['id'];
 
         let name = responseAsJson['forms'][0]['name'];
         let id = responseAsJson['id'];
@@ -52,32 +43,8 @@ async function loadPokemon() {
         let special_defense = responseAsJson['stats'][4]['base_stat'];
         let speed = responseAsJson['stats'][5]['base_stat'];
         let types = [];
-        let id_second_evolution = [];
-        let id_third_evolution = [];
         let weight = responseAsJson['weight'];
         let height = responseAsJson['height'];
-
-        let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
-
-        for (let e = 0; e < possibleSecondEvolutions.length; e++) {
-            let urlSecondEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['species']['url'];
-            let responseSecondEvolution = await fetch(urlSecondEvolution);
-            let responseSecondEvolutionAsJson = await responseSecondEvolution.json();
-            let idSecondEvolution = responseSecondEvolutionAsJson['id'];
-
-            id_second_evolution.push(idSecondEvolution);
-
-            let possibleThirdEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'];
-
-            for (let f = 0; f < possibleThirdEvolutions.length; f++) {
-                let urlThirdEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'][f]['species']['url'];
-                let responseThirdEvolution = await fetch(urlThirdEvolution);
-                let responseThirdEvolutionAsJson = await responseThirdEvolution.json();
-                let idThirdEvolution = responseThirdEvolutionAsJson['id'];
-
-                id_third_evolution.push(idThirdEvolution);
-            };
-        };
 
         for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
             let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
@@ -90,13 +57,13 @@ async function loadPokemon() {
             const element = responseAsJson['types'][t];
             types.push(element['type']['name']);
         };
-        pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution);
+        pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types);
     };
     renderPokemonInfo();
 };
 
 
-function pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution) {
+function pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types) {
     loadedPokemons.push(
         {
             'name': name,
@@ -109,9 +76,6 @@ function pushToJson(i, name, id, img, hp, attack, defense, special_attack, speci
             'special_defense': special_defense,
             'speed': speed,
             'types': types,
-            'id_first_evolution': id_first_evolution,
-            'id_second_evolution': id_second_evolution,
-            'id_third_evolution': id_third_evolution,
             'weight': weight,
             'height': height,
             'i': i,
@@ -212,25 +176,12 @@ function addCloseWithEscape() {
 function templateDetails(i) {
     return /*html*/`
         <div class="container-single-pokemon card-width-detail">
-            <div class="container-container-card border-none margin-horizontal">
-                <div onclick="doNotClose(event)" class="container-card">
-                    <div class="${loadedPokemons[i]['types'][0]} card-body-details">
-                        <img src="${loadedPokemons[i]['img']}" class="img-details" alt="...">
-                        </div>
-                            <div class="right-side-complete">
-                                <div class="card_headline_details">
-                                    <div class="types-details">
-                                        <h5 class="card-title small-headline-350px">${loadedPokemons[i]['name'].slice(0, 1).toUpperCase()}${loadedPokemons[i]['name'].slice(1)}</h5>
-                                        ${insertTypes(i)}
-                                    </div>
-                                    <p class="small-350px"># ${loadedPokemons[i]['id']}</p>
-                                </div>
-                                    <div class="sizes">
-                                        <p class="small-350px">Weight: ${loadedPokemons[i]['weight'] / 10} kg</p>
-                                        <p class="small-350px">Height: ${loadedPokemons[i]['height'] / 10} m</p>
-                                    </div>
-                                ${templateRightSideDetails(i)}
-                        </div>
+            <div onclick="doNotClose(event)" class="card mb-2 border-none margin-horizontal">
+                <div class="row g-0">
+                    <div class="col-sm-4 ${loadedPokemons[i]['types'][0]} card-body-details">
+                        <img src="${loadedPokemons[i]['img']}" class="img-fluid rounded-start" alt="...">
+                    </div>
+                    ${templateRightSideDetails(i)}
                 </div>
             </div>
             ${templateButtonsDetails(i)}
@@ -249,122 +200,31 @@ function templateButtonsDetails(i) {
 };
 
 
-
 function templateRightSideDetails(i) {
     return /*html*/`
-<div class="accordion" id="accordionExample">
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        <b>Stats</b>
-      </button>
-    </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        <!-- Nachfolgend Einbettung Graph für Stats -->
-        <div class="stats">
-            <canvas id="myChart"></canvas>
-        </div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-        <b>Abilities</b>
-      </button>
-    </h2>
-    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        Abilities
-    </div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-        <b>Evolution</b>
-      </button>
-    </h2>
-    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        ${templateEvolution(i)}
-      </div>
-    </div>
-  </div>
-</div>
-    `;
-};
-
-
-function templateEvolution(i) {
-
-    return /*html*/`
-        <div class="container-evolution">
-            <div class="first-evolution">
-                ${inserFirstEvolution(i)}
-            </div>
-
-            <div id="test" class="second-evolution">
-                ${getImagesSecondEvolution(i)}
-            </div>
-                
-                
-               
-            <div class="third-evolution">
-
-            </div>
-
-
-        </div>
-
-    `;
-
-};
-
-
-function inserFirstEvolution(i) {
-    const pokemon = loadedPokemons[i]['id_first_evolution'];
-    if (pokemon < loadedPokemons.length) {
-        return /*html*/`
-            <div class="container-img-evolution-detail ${loadedPokemons[pokemon - 1]['types'][0]}">
-                <img class="img-evolution-detail" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
-            </div>   
-        `;
-    } else {
-        return /*html*/`
-            <p>Pokemon not loaded</p>
-        `
-    };
-};
-
-
-
-function getImagesSecondEvolution(i) { // bisher wird leider nur das erste von mehreren möglichen zweiten Entwicklungen geladen
-
-    const pokemon = loadedPokemons[i]['id_second_evolution'];
-
-    for (let j = 0; j < loadedPokemons[i]['id_second_evolution'].length; j++) {
-
-        if (pokemon[j] < loadedPokemons.length) {
-             return /*html*/`
-                <div id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
-                    <img class="img-evolution-detail" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
+        <div class="col-sm-8 card-detail-right">
+            <div class="card-body">
+                <div class="card_headline_details">
+                    <div class="types-details">
+                        <h5 class="card-title small-headline-350px">${loadedPokemons[i]['name'].slice(0, 1).toUpperCase()}${loadedPokemons[i]['name'].slice(1)}</h5>
+                        ${insertTypes(i)}
+                    </div>
+                    <p class="small-350px"># ${loadedPokemons[i]['id']}</p>
                 </div>
-        `;
-        } else {
-            return /*html*/`
-        <p>not possible</p>
+                <div class="details-right-bottom">
+                    <div class="sizes">
+                        <p class="small-350px">Weight: ${loadedPokemons[i]['weight'] / 10} kg</p>
+                        <p class="small-350px">Height: ${loadedPokemons[i]['height'] / 10} m</p>
+                    </div>
+
+                    <div class="stats">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
-        };
-    };
 };
-
-
-
-
-
-
-
 
 
 function previousPokemon(i) {
@@ -451,24 +311,5 @@ function optionsCanvas() {
         }
     }
 };
-
-
-
-/* Test für swipe */
-
-
-document.addEventListener('swiped', function (event) {
-    console.log(event.target); // the element that was swiped
-    console.log(event.detail.dir); // swiped direction
-});
-
-document.addEventListener('swiped-left', function (event) {
-    console.log(event.target); // the element that was swiped
-});
-
-document.addEventListener('swiped-right', function (e) {
-    console.log(event.target); // the element that was swiped
-});
-
 
 
