@@ -90,10 +90,12 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    overflow: auto;
 }
 
 .container-single-pokemon {
     max-height: 100%;
+
 }
 
 .card-width-detail {
@@ -264,4 +266,29 @@ footer {
     background-color: #7038F8;
     /* border: 1px solid #4924A1; */
     border: none;
+}
+
+
+/* @media (max-width: 575px) {
+    .margin-horizontal {
+        margin-left: 1%;
+        margin-right: 1%;
+    }
+} */
+
+
+@media (max-width: 350px) {
+
+    .small-headline-350px {
+        font-size: 16px;
+    }
+
+    .small-350px {
+        font-size: 14px;
+    }
+
+    .sizes {
+        gap: 6px;
+    }
+
 }

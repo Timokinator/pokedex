@@ -129,7 +129,7 @@ function insertTypes(i) {
 
 function oneType(i) {
     return /*html*/`
-    <div class="type_container">
+    <div class="type_container small-350px">
         <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
     </div>`
 };
@@ -137,7 +137,7 @@ function oneType(i) {
 
 function twoTypes(i) {
     return /*html*/`
-    <div class="type_container">
+    <div class="type_container small-350px">
         <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
         <p class="type ${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
     </div>`
@@ -146,7 +146,7 @@ function twoTypes(i) {
 
 function threeTypes(i) {
     return /*html*/`
-    <div class="type_container">    
+    <div class="type_container small-350px">    
         <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
         <p class="type ${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
         <p class="type ${loadedPokemons[i]['types'][2]}">${loadedPokemons[i]['types'][3]}</p>
@@ -175,47 +175,63 @@ function addCloseWithEscape() {
 
 function templateDetails(i) {
     return /*html*/`
-<div class="container-single-pokemon card-width-detail">
-   <div onclick="doNotClose(event)" class="card mb-2 border-none " style="margin: 0">
-      <div class="row g-0">
-         <div class="col-sm-4 ${loadedPokemons[i]['types'][0]} card-body-details">
-            <img src="${loadedPokemons[i]['img']}" class="img-fluid rounded-start" alt="...">
-         </div>
-         <div class="col-sm-8 card-detail-right">
-            <div class="card-body">
-               <div class="card_headline_details">
-                  <div class="types-details">
-                     <h5 class="card-title">${loadedPokemons[i]['name'].slice(0, 1).toUpperCase()}${loadedPokemons[i]['name'].slice(1)}</h5>
-                     ${insertTypes(i)}
-                  </div>
-                  <p># ${loadedPokemons[i]['id']}</p>
-               </div>
-               <div class="details-right-bottom">
-
-                    <div class="sizes">
-                        <p>Weight: ${loadedPokemons[i]['weight'] / 10} kg</p>
-                        <p>Height: ${loadedPokemons[i]['height'] / 10} m</p>
+        <div class="container-single-pokemon card-width-detail">
+        <div onclick="doNotClose(event)" class="card mb-2 border-none margin-horizontal">
+            <div class="row g-0">
+                    <div class="col-sm-4 ${loadedPokemons[i]['types'][0]} card-body-details">
+                        <img src="${loadedPokemons[i]['img']}" class="img-fluid rounded-start" alt="...">
                     </div>
-
-                    <div class="stats">
-                        <canvas id="myChart"></canvas>
-                    </div>
-
-
-
-               </div>
+                    ${templateRightSideDetails(i)}
             </div>
-         </div>
-      </div>
-   </div>
+        </div>
+        ${templateButtonsDetails(i)}
+        </div>
+    `;
+};
 
-   <div class="btn-container-detail">
+
+function templateButtonsDetails(i) {
+    return /*html*/`
+    <div class="btn-container-detail">
       <button class="btn-detail hover-effect ${loadedPokemons[i]['types'][0]}" onclick="previousPokemon(${i}); onclick=doNotClose(event)"><-</button>
       <button class="btn-detail hover-effect ${loadedPokemons[i]['types'][0]}" onclick="nextPokemon(${i}); onclick=doNotClose(event)">-></button>
    </div>
-</div>
-`;
+    `;
 };
+
+
+function templateRightSideDetails(i) {
+    return /*html*/`
+    <div class="col-sm-8 card-detail-right">
+                <div class="card-body">
+                    <div class="card_headline_details">
+                        <div class="types-details">
+                            <h5 class="card-title small-headline-350px">${loadedPokemons[i]['name'].slice(0, 1).toUpperCase()}${loadedPokemons[i]['name'].slice(1)}</h5>
+                            ${insertTypes(i)}
+                        </div>
+                        <p class="small-350px"># ${loadedPokemons[i]['id']}</p>
+                    </div>
+                    <div class="details-right-bottom">
+                        <div class="sizes">
+                            <p class="small-350px">Weight: ${loadedPokemons[i]['weight'] / 10} kg</p>
+                            <p class="small-350px">Height: ${loadedPokemons[i]['height'] / 10} m</p>
+                        </div>
+
+                        <div class="stats">
+                            <canvas id="myChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    `;
+};
+
+
+
+
+
+
+
 
 
 function previousPokemon(i) {
@@ -266,7 +282,7 @@ function createCanvas(i) {
 
 function newChart(ctx, hp, attack, defense, special_attack, special_defense, speed) {
     Chart.defaults.font.size = 10;
-    
+
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -293,7 +309,7 @@ function optionsCanvas() {
         },
         responsive: true,
         maintainAspectRatio: true,
-        aspectRatio: 2/1.2,
+        aspectRatio: 2 / 1.2,
         indexAxis: 'y',
         plugins: {
             legend: {
