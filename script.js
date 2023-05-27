@@ -23,7 +23,7 @@ let loadedPokemons = [];
 
 async function loadPokemon() {
 
-    for (let i = 1; i < 151; i++) {
+    for (let i = 1; i < 161; i++) {
 
         let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
         let response = await fetch(url);
@@ -197,6 +197,8 @@ function showDetails(i) {
     content.innerHTML = templateDetails(i);
     addCloseWithEscape();
     createCanvas(i);
+    getImagesSecondEvolution(i);
+    getImagesThirdEvolution(i);
 };
 
 
@@ -301,16 +303,15 @@ function templateEvolution(i) {
     return /*html*/`
         <div class="container-evolution">
             <div class="first-evolution">
-                ${inserFirstEvolution(i)}
+                ${insertFirstEvolution(i)}
             </div>
 
-            <div id="test" class="second-evolution">
-                ${getImagesSecondEvolution(i)}
+            <div id="container_second_evolution" class="second-evolution">
+                
             </div>
-                
-                
-               
-            <div class="third-evolution">
+           
+
+            <div id="container_third_evolution" class="third-evolution">
 
             </div>
 
@@ -319,45 +320,98 @@ function templateEvolution(i) {
 
     `;
 
+
 };
 
 
-function inserFirstEvolution(i) {
+function showDetailsfromEvolution(i) {
+    closeDetails();
+    showDetails(i);
+};
+
+
+function insertFirstEvolution(i) { // noch Fehler bei onclick in div
     const pokemon = loadedPokemons[i]['id_first_evolution'];
-    if (pokemon < loadedPokemons.length) {
+    if (pokemon < loadedPokemons.length + 1) {
         return /*html*/`
             <div class="container-img-evolution-detail ${loadedPokemons[pokemon - 1]['types'][0]}">
-                <img class="img-evolution-detail" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
+                <img class="img-evolution-detail hover-effect" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
             </div>   
         `;
     } else {
         return /*html*/`
-            <p>Pokemon not loaded</p>
+            <p>Pokemon not yet loaded</p>
         `
     };
 };
 
 
 
-function getImagesSecondEvolution(i) { // bisher wird leider nur das erste von mehreren möglichen zweiten Entwicklungen geladen
+function getImagesSecondEvolution(i) {
 
     const pokemon = loadedPokemons[i]['id_second_evolution'];
 
-    for (let j = 0; j < loadedPokemons[i]['id_second_evolution'].length; j++) {
+    content_evolution2 = document.getElementById('container_second_evolution');
+    content_evolution2.innerHTML = '';
 
-        if (pokemon[j] < loadedPokemons.length) {
-             return /*html*/`
+    if (pokemon.length > 0) {
+        for (let j = 0; j < loadedPokemons[i]['id_second_evolution'].length; j++) {
+            if (pokemon[j] < loadedPokemons.length + 1) {
+                content_evolution2.innerHTML += /*html*/`
                 <div id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
                     <img class="img-evolution-detail" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
                 </div>
-        `;
-        } else {
-            return /*html*/`
-        <p>not possible</p>
-    `;
+            `;
+            } else {
+                content_evolution2.innerHTML += /*html*/`
+        <p>Pokemon with ID <b>${pokemon[j]}</b> not yet loaded</p>
+            `;
+            };
         };
+    } else {
+        content_evolution2.innerHTML += /*html*/`
+            <p>No evolution</p>
+        `;
     };
 };
+
+
+function getImagesThirdEvolution(i) {
+
+    const pokemon = loadedPokemons[i]['id_third_evolution'];
+
+    content_evolution3 = document.getElementById('container_third_evolution');
+    content_evolution3.innerHTML = '';
+
+    if (pokemon.length > 0) {
+        for (let j = 0; j < loadedPokemons[i]['id_third_evolution'].length; j++) {
+            if (pokemon[j] < loadedPokemons.length + 1) {
+                content_evolution3.innerHTML += /*html*/`
+                <div id="img_third_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
+                    <img class="img-evolution-detail" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
+                </div>
+            `;
+            } else {
+                content_evolution3.innerHTML += /*html*/`
+                <p>Pokemon with ID <b>${pokemon[j]}</b> not yet loaded</p>
+            `;
+            };
+        };
+    } else {
+        content_evolution3.innerHTML += /*html*/`
+        
+        `;
+    };
+};
+
+
+
+
+
+
+
+
+
 
 
 
