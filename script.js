@@ -22,7 +22,7 @@ let loadedPokemons = [];
 let listOfids = [];
 
 let start_i = 1;
-let end_i = 35;
+let end_i = 21;
 
 
 
@@ -30,77 +30,107 @@ async function loadPokemon(start, end) {
 
     for (let i = start; i < end; i++) {
 
-        let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
-        let response = await fetch(url);
-        let responseAsJson = await response.json();
+        if (!listOfids.includes(i)) {
 
-        let url_description = `https://pokeapi.co/api/v2/pokemon-species/${i}/`;
-        let responseDescription = await fetch(url_description);
-        let responseDescriptionAsJson = await responseDescription.json();
+            let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
+            let response = await fetch(url);
+            let responseAsJson = await response.json();
 
-        let url_evolutionChain = responseDescriptionAsJson['evolution_chain']['url'];
-        let responseEvolutionChain = await fetch(url_evolutionChain);
-        let responseEvolutionChainAsJson = await responseEvolutionChain.json();
+            let url_description = `https://pokeapi.co/api/v2/pokemon-species/${i}/`;
+            let responseDescription = await fetch(url_description);
+            let responseDescriptionAsJson = await responseDescription.json();
 
-        let urlFirstEvolution = responseEvolutionChainAsJson['chain']['species']['url'];
-        let responseFirstEvolution = await fetch(urlFirstEvolution);
-        let responseFirstEvolutionAsJson = await responseFirstEvolution.json();
-        let id_first_evolution = responseFirstEvolutionAsJson['id'];
+            let url_evolutionChain = responseDescriptionAsJson['evolution_chain']['url'];
+            let responseEvolutionChain = await fetch(url_evolutionChain);
+            let responseEvolutionChainAsJson = await responseEvolutionChain.json();
 
-        let name = responseAsJson['forms'][0]['name'];
-        let id = responseAsJson['id'];
-        let img = responseAsJson['sprites']['other']['official-artwork']['front_default'];
-        let hp = responseAsJson['stats'][0]['base_stat'];
-        let attack = responseAsJson['stats'][1]['base_stat'];
-        let defense = responseAsJson['stats'][2]['base_stat'];
-        let special_attack = responseAsJson['stats'][3]['base_stat'];
-        let special_defense = responseAsJson['stats'][4]['base_stat'];
-        let speed = responseAsJson['stats'][5]['base_stat'];
-        let types = [];
-        let id_second_evolution = [];
-        let id_third_evolution = [];
-        let weight = responseAsJson['weight'];
-        let height = responseAsJson['height'];
+            let urlFirstEvolution = responseEvolutionChainAsJson['chain']['species']['url'];
+            let responseFirstEvolution = await fetch(urlFirstEvolution);
+            let responseFirstEvolutionAsJson = await responseFirstEvolution.json();
+            let id_first_evolution = responseFirstEvolutionAsJson['id'];
 
-        let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
+            let name = responseAsJson['forms'][0]['name'];
+            let id = responseAsJson['id'];
+            let img = responseAsJson['sprites']['other']['official-artwork']['front_default'];
+            let hp = responseAsJson['stats'][0]['base_stat'];
+            let attack = responseAsJson['stats'][1]['base_stat'];
+            let defense = responseAsJson['stats'][2]['base_stat'];
+            let special_attack = responseAsJson['stats'][3]['base_stat'];
+            let special_defense = responseAsJson['stats'][4]['base_stat'];
+            let speed = responseAsJson['stats'][5]['base_stat'];
+            let types = [];
+            let id_second_evolution = [];
+            let id_third_evolution = [];
+            let weight = responseAsJson['weight'];
+            let height = responseAsJson['height'];
 
-        for (let e = 0; e < possibleSecondEvolutions.length; e++) {
-            let urlSecondEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['species']['url'];
-            let responseSecondEvolution = await fetch(urlSecondEvolution);
-            let responseSecondEvolutionAsJson = await responseSecondEvolution.json();
-            let idSecondEvolution = responseSecondEvolutionAsJson['id'];
+            let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
 
-            id_second_evolution.push(idSecondEvolution);
+            for (let e = 0; e < possibleSecondEvolutions.length; e++) {
+                let urlSecondEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['species']['url'];
+                let responseSecondEvolution = await fetch(urlSecondEvolution);
+                let responseSecondEvolutionAsJson = await responseSecondEvolution.json();
+                let idSecondEvolution = responseSecondEvolutionAsJson['id'];
 
-            let possibleThirdEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'];
+                id_second_evolution.push(idSecondEvolution);
 
-            for (let f = 0; f < possibleThirdEvolutions.length; f++) {
-                let urlThirdEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'][f]['species']['url'];
-                let responseThirdEvolution = await fetch(urlThirdEvolution);
-                let responseThirdEvolutionAsJson = await responseThirdEvolution.json();
-                let idThirdEvolution = responseThirdEvolutionAsJson['id'];
+                let possibleThirdEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'];
 
-                id_third_evolution.push(idThirdEvolution);
+                for (let f = 0; f < possibleThirdEvolutions.length; f++) {
+                    let urlThirdEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'][f]['species']['url'];
+                    let responseThirdEvolution = await fetch(urlThirdEvolution);
+                    let responseThirdEvolutionAsJson = await responseThirdEvolution.json();
+                    let idThirdEvolution = responseThirdEvolutionAsJson['id'];
+
+                    id_third_evolution.push(idThirdEvolution);
+                };
             };
-        };
 
-        for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
-            let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
-            if (language == 'en') {
-                description = responseDescriptionAsJson['flavor_text_entries'][j]['flavor_text'];
+            for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
+                let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
+                if (language == 'en') {
+                    description = responseDescriptionAsJson['flavor_text_entries'][j]['flavor_text'];
+                };
             };
+
+            for (let t = 0; t < responseAsJson['types'].length; t++) {
+                const element = responseAsJson['types'][t];
+                types.push(element['type']['name']);
+            };
+            pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution);
+        } else {
+            console.log('else');
         };
 
-        for (let t = 0; t < responseAsJson['types'].length; t++) {
-            const element = responseAsJson['types'][t];
-            types.push(element['type']['name']);
-        };
-        pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution);
     };
+
     sortPokemon();
     pushIdToListOfIds();
     renderPokemonInfo();
 };
+
+
+function load20More() {
+    toggleLoadButton(0);
+    start_i = end_i;
+    end_i += 20;
+    loadPokemon(start_i, end_i);
+    toggleLoadButton(5000);
+};
+
+
+function toggleLoadButton(time) {
+    let button = document.getElementById('button-load-more');
+    setTimeout(function () { button.disabled = !button.disabled; }, time);
+};
+
+
+function addLoadButton() {
+    document.getElementById('container-button-load-more').innerHTML = /*html*/`
+        <button id="button-load-more" onclick="load20More()" class="btn btn-primary button-load-more">Load more</button>
+    `;
+};
+
 
 
 function sortPokemon() {
@@ -276,7 +306,6 @@ function templateButtonsDetails(i) {
 };
 
 
-
 function templateRightSideDetails(i) {
     return /*html*/`
 <div class="accordion" id="accordionExample">
@@ -345,131 +374,86 @@ function showDetailsfromEvolution(i) {
 };
 
 
-function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.length+1 noch umstellen um einzelne Pokemon laden zu können
+async function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.length+1 noch umstellen um einzelne Pokemon laden zu können
     const pokemon = loadedPokemons[i]['id_first_evolution'];
-    // const pokemonId = pokemon
 
     content_evolution1 = document.getElementById('container_first_evolution');
     content_evolution1.innerHTML = '';
 
     if (!listOfids.includes(pokemon)) {
-        loadPokemon(pokemon, pokemon + 1);
+        await loadPokemon(pokemon, pokemon + 1);
     };
 
+    const pokemonId = listOfids.indexOf(pokemon);
+
     content_evolution1.innerHTML = /*html*/`
-    <div onclick="showDetailsfromEvolution(${pokemon - 1})" class="container-img-evolution-detail ${loadedPokemons[pokemon]['types'][0]}">
-        <img class="img-evolution-detail hover-effect-small" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
+    <div onclick="showDetailsfromEvolution(${pokemonId})" class="container-img-evolution-detail ${loadedPokemons[pokemonId]['types'][0]}">
+        <img class="img-evolution-detail hover-effect-small" src="${loadedPokemons[pokemonId]['img']}" alt="">
     </div>   
     `;
 };
 
 
-/* Backup first Evolution
-
-function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.length+1 noch umstellen um einzelne Pokemon laden zu können
-    const pokemon = loadedPokemons[i]['id_first_evolution'];
-    if (pokemon < loadedPokemons.length + 1) {
-        return `
-        <div onclick="showDetailsfromEvolution(${pokemon - 1})" class="container-img-evolution-detail ${loadedPokemons[pokemon - 1]['types'][0]}">
-        <img class="img-evolution-detail hover-effect-small" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
-    </div>   
-`;
-} else {
-return `
-    <p class="evolution-p ${loadedPokemons[i]['types'][0]}">Pokemon with<br>ID <b>${pokemon}</b><br>not yet loaded</p>
-`
-};
-};
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getImagesSecondEvolution(i) {
-
-    const pokemon = loadedPokemons[i]['id_second_evolution'];
-
+async function getImagesSecondEvolution(i) {
     content_evolution2 = document.getElementById('container_second_evolution');
     content_evolution2.innerHTML = '';
 
+    const pokemon = loadedPokemons[i]['id_second_evolution'];
+
     if (pokemon.length > 0) {
-        for (let j = 0; j < loadedPokemons[i]['id_second_evolution'].length; j++) {
-            if (pokemon[j] < loadedPokemons.length + 1) {
-                content_evolution2.innerHTML += /*html*/`
-                <div onclick="showDetailsfromEvolution(${pokemon[j] - 1})" id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
-                    <img class="img-evolution-detail hover-effect-small" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
-                </div>
-            `;
-            } else {
-                content_evolution2.innerHTML += /*html*/`
-        <p class="evolution-p ${loadedPokemons[i]['types'][0]}">Pokemon with<br>ID <b>${pokemon[j]}</b><br>not yet loaded</p>
-            `;
-            };
+
+        for (let p = 0; p < pokemon.length; p++) {
+            const element = pokemon[p];
+            if (!listOfids.includes(element)) {
+                await loadPokemon(element, element + 1);
+            }
+
+            const pokemonId = listOfids.indexOf(element);
+
+            content_evolution2.innerHTML += /*html*/`
+        <div onclick="showDetailsfromEvolution(${pokemonId})" id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemonId]['types'][0]}">
+            <img class="img-evolution-detail hover-effect-small" src= "${loadedPokemons[pokemonId]['img']}" alt="">   
+        </div>
+    `;
         };
     } else {
+
         // document.getElementById('arrow_1').classList.add('d-none');
         content_evolution2.innerHTML += /*html*/`
-            <div class="container-no-evolution">
-                <p class="no-evolution-p">No evolution</p>
-                <img class="img-no-evolution" src="./img/no-evolution.png" alt="">
-            </div>    
-        `;
+         <div class="container-no-evolution">
+             <p class="no-evolution-p">No evolution</p>
+             <img class="img-no-evolution" src="./img/no-evolution.png" alt="">
+         </div>    
+     `;
     };
 };
 
 
-function getImagesThirdEvolution(i) {
-
-    const pokemon = loadedPokemons[i]['id_third_evolution'];
-
+async function getImagesThirdEvolution(i) {
     content_evolution3 = document.getElementById('container_third_evolution');
     content_evolution3.innerHTML = '';
+    const pokemon = loadedPokemons[i]['id_third_evolution'];
 
     if (pokemon.length > 0) {
-        for (let j = 0; j < loadedPokemons[i]['id_third_evolution'].length; j++) {
-            if (pokemon[j] < loadedPokemons.length + 1) {
-                content_evolution3.innerHTML += /*html*/`
-                <div onclick="showDetailsfromEvolution(${pokemon[j] - 1})" id="img_third_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
-                    <img class="img-evolution-detail hover-effect-small" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
-                </div>
-            `;
-            } else {
-                content_evolution3.innerHTML += /*html*/`
-                <p class="evolution-p ${loadedPokemons[i]['types'][0]}">Pokemon with<br>ID <b>${pokemon[j]}</b><br>not yet loaded</p>
-            `;
+        for (let p = 0; p < pokemon.length; p++) {
+            const element = pokemon[p];
+            if (!listOfids.includes(element)) {
+                await loadPokemon(element, element + 1);
             };
+
+            const pokemonId = listOfids.indexOf(element);
+
+            content_evolution3.innerHTML += /*html*/`
+            <div onclick="showDetailsfromEvolution(${pokemonId})" id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemonId]['types'][0]}">
+                <img class="img-evolution-detail hover-effect-small" src= "${loadedPokemons[pokemonId]['img']}" alt="">   
+            </div>
+            `;
         };
     } else {
         document.getElementById('arrow_2').classList.add('d-none');
         content_evolution3.classList.add('d-none');
     };
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function previousPokemon(i) {

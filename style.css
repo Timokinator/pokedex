@@ -144,7 +144,7 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 24px;
+    padding-top: 16px;
 }
 
 .border-none {
@@ -274,9 +274,21 @@ footer {
     font-size: 24px;
 }
 
+.button-load-more {
+    margin: 24px;
+    font-size: 24px;
+}
+
 
 
 /* Type-colors */
+
+.fairy {
+    background-color: rgba(240, 188, 230, 1);
+    /* border: 1px solid #6D6D4E; */
+    border: none;
+}
+
 
 .normal {
     background-color: #A8A878;
