@@ -19,7 +19,8 @@ const borderColorCanvas = [
 ];
 
 let loadedPokemons = [];
-let listOfids = [];
+let listOfIds = [];
+let listOfNames = [];
 
 let start_i = 1;
 let end_i = 21;
@@ -30,7 +31,7 @@ async function loadPokemon(start, end) {
 
     for (let i = start; i < end; i++) {
 
-        if (!listOfids.includes(i)) {
+        if (!listOfIds.includes(i)) {
 
             let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
             let response = await fetch(url);
@@ -105,7 +106,7 @@ async function loadPokemon(start, end) {
     };
 
     sortPokemon();
-    pushIdToListOfIds();
+    pushIdandNameToList();
     renderPokemonInfo();
 };
 
@@ -140,12 +141,14 @@ function sortPokemon() {
 };
 
 
-function pushIdToListOfIds() {
-    listOfids = [];
+function pushIdandNameToList() {
+    listOfNames = [];
+    listOfIds = [];
     for (let i = 0; i < loadedPokemons.length; i++) {
         const pokemon = loadedPokemons[i];
 
-        listOfids.push(pokemon['id']);
+        listOfIds.push(pokemon['id']);
+        listOfNames.push(pokemon['name']);
     };
 };
 
@@ -380,11 +383,11 @@ async function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.l
     content_evolution1 = document.getElementById('container_first_evolution');
     content_evolution1.innerHTML = '';
 
-    if (!listOfids.includes(pokemon)) {
+    if (!listOfIds.includes(pokemon)) {
         await loadPokemon(pokemon, pokemon + 1);
     };
 
-    const pokemonId = listOfids.indexOf(pokemon);
+    const pokemonId = listOfIds.indexOf(pokemon);
 
     content_evolution1.innerHTML = /*html*/`
     <div onclick="showDetailsfromEvolution(${pokemonId})" class="container-img-evolution-detail ${loadedPokemons[pokemonId]['types'][0]}">
@@ -404,11 +407,11 @@ async function getImagesSecondEvolution(i) {
 
         for (let p = 0; p < pokemon.length; p++) {
             const element = pokemon[p];
-            if (!listOfids.includes(element)) {
+            if (!listOfIds.includes(element)) {
                 await loadPokemon(element, element + 1);
             }
 
-            const pokemonId = listOfids.indexOf(element);
+            const pokemonId = listOfIds.indexOf(element);
 
             content_evolution2.innerHTML += /*html*/`
         <div onclick="showDetailsfromEvolution(${pokemonId})" id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemonId]['types'][0]}">
@@ -437,11 +440,11 @@ async function getImagesThirdEvolution(i) {
     if (pokemon.length > 0) {
         for (let p = 0; p < pokemon.length; p++) {
             const element = pokemon[p];
-            if (!listOfids.includes(element)) {
+            if (!listOfIds.includes(element)) {
                 await loadPokemon(element, element + 1);
             };
 
-            const pokemonId = listOfids.indexOf(element);
+            const pokemonId = listOfIds.indexOf(element);
 
             content_evolution3.innerHTML += /*html*/`
             <div onclick="showDetailsfromEvolution(${pokemonId})" id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemonId]['types'][0]}">
@@ -480,6 +483,7 @@ function closeDetails() {
     const content = document.getElementById('singlePokemon');
     content.innerHTML = '';
     content.classList.add('d-none');
+    document.getElementById('random_button').disabled = false;
 };
 
 
@@ -542,6 +546,15 @@ function optionsCanvas() {
 };
 
 
+async function randomPokemon() {
+    document.getElementById('random_button').disabled = true;
+    let randomNumnber = Math.floor(Math.random() * 1000);
+    await loadPokemon(randomNumnber, randomNumnber+1);
+    let id = listOfIds.indexOf(randomNumnber);
+    showDetails(id);
+};
+
+
 
 /* Test für swipe */
 
@@ -558,6 +571,7 @@ document.addEventListener('swiped-left', function (event) {
 document.addEventListener('swiped-right', function (e) {
     console.log(event.target); // the element that was swiped
 });
+
 
 
 
