@@ -6,6 +6,9 @@ body {
     align-items: center;
 }
 
+.d-none {
+    display: none;
+}
 
 #pokedex {
     min-height: 50vh;
@@ -26,6 +29,13 @@ body {
     scale: 1.02;
     cursor: pointer;
 }
+
+
+.hover-effect-small:hover {
+    scale: 1.5;
+    cursor: pointer;
+}
+
 
 .card_headline {
     display: flex;
@@ -202,8 +212,25 @@ footer {
     align-items: center;
 }
 
+.first-evolution, .second-evolution, .third-evolution {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    align-items: center;
+    text-align: center;
+    width: 33%;
+}
+
+.accordion-body-evolution {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+
 .container-img-evolution-detail {
-    width: 25%;
+    width: 50%;
     border-radius: 100%;
     display: flex;
     flex-direction: column;
@@ -214,6 +241,37 @@ footer {
 .img-evolution-detail {
     width: 100%;
     padding: 5%;
+}
+
+.evolution-p {
+    font-size: 10px;
+    margin-bottom: 0;
+    border-radius: 100%;
+    padding: 10%;
+}
+
+.no-evolution-p {
+    font-size: 16px;
+    margin-bottom: 0;
+
+}
+
+.img-no-evolution {
+    width: 35%;
+}
+
+
+.container-no-evolution {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+}
+
+.arrow-evolution {
+    margin: 0;
+    font-size: 24px;
 }
 
 

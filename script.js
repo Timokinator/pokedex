@@ -19,11 +19,16 @@ const borderColorCanvas = [
 ];
 
 let loadedPokemons = [];
+let listOfids = [];
+
+let start_i = 1;
+let end_i = 35;
 
 
-async function loadPokemon() {
 
-    for (let i = 1; i < 161; i++) {
+async function loadPokemon(start, end) {
+
+    for (let i = start; i < end; i++) {
 
         let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
         let response = await fetch(url);
@@ -92,7 +97,26 @@ async function loadPokemon() {
         };
         pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution);
     };
+    sortPokemon();
+    pushIdToListOfIds();
     renderPokemonInfo();
+};
+
+
+function sortPokemon() {
+    loadedPokemons.sort(function (a, b) {
+        return a.id - b.id;
+    });
+};
+
+
+function pushIdToListOfIds() {
+    listOfids = [];
+    for (let i = 0; i < loadedPokemons.length; i++) {
+        const pokemon = loadedPokemons[i];
+
+        listOfids.push(pokemon['id']);
+    };
 };
 
 
@@ -197,6 +221,7 @@ function showDetails(i) {
     content.innerHTML = templateDetails(i);
     addCloseWithEscape();
     createCanvas(i);
+    insertFirstEvolution(i);
     getImagesSecondEvolution(i);
     getImagesThirdEvolution(i);
 };
@@ -288,7 +313,7 @@ function templateRightSideDetails(i) {
       </button>
     </h2>
     <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
+      <div class="accordion-body accordion-body-evolution">
         ${templateEvolution(i)}
       </div>
     </div>
@@ -299,28 +324,18 @@ function templateRightSideDetails(i) {
 
 
 function templateEvolution(i) {
-
     return /*html*/`
         <div class="container-evolution">
-            <div class="first-evolution">
-                ${insertFirstEvolution(i)}
+            <div id="container_first_evolution" class="first-evolution">
             </div>
-
+            <p id="arrow_1" class="arrow-evolution">></p>
             <div id="container_second_evolution" class="second-evolution">
-                
             </div>
-           
-
+            <p id="arrow_2" class="arrow-evolution">></p>
             <div id="container_third_evolution" class="third-evolution">
-
             </div>
-
-
         </div>
-
     `;
-
-
 };
 
 
@@ -330,20 +345,53 @@ function showDetailsfromEvolution(i) {
 };
 
 
-function insertFirstEvolution(i) { // noch Fehler bei onclick in div
+function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.length+1 noch umstellen um einzelne Pokemon laden zu können
+    const pokemon = loadedPokemons[i]['id_first_evolution'];
+    // const pokemonId = pokemon
+
+    content_evolution1 = document.getElementById('container_first_evolution');
+    content_evolution1.innerHTML = '';
+
+    if (!listOfids.includes(pokemon)) {
+        loadPokemon(pokemon, pokemon + 1);
+    };
+
+    content_evolution1.innerHTML = /*html*/`
+    <div onclick="showDetailsfromEvolution(${pokemon - 1})" class="container-img-evolution-detail ${loadedPokemons[pokemon]['types'][0]}">
+        <img class="img-evolution-detail hover-effect-small" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
+    </div>   
+    `;
+};
+
+
+/* Backup first Evolution
+
+function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.length+1 noch umstellen um einzelne Pokemon laden zu können
     const pokemon = loadedPokemons[i]['id_first_evolution'];
     if (pokemon < loadedPokemons.length + 1) {
-        return /*html*/`
-            <div class="container-img-evolution-detail ${loadedPokemons[pokemon - 1]['types'][0]}">
-                <img class="img-evolution-detail hover-effect" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
-            </div>   
-        `;
-    } else {
-        return /*html*/`
-            <p>Pokemon not yet loaded</p>
-        `
-    };
+        return `
+        <div onclick="showDetailsfromEvolution(${pokemon - 1})" class="container-img-evolution-detail ${loadedPokemons[pokemon - 1]['types'][0]}">
+        <img class="img-evolution-detail hover-effect-small" src="${loadedPokemons[pokemon - 1]['img']}" alt="">
+    </div>   
+`;
+} else {
+return `
+    <p class="evolution-p ${loadedPokemons[i]['types'][0]}">Pokemon with<br>ID <b>${pokemon}</b><br>not yet loaded</p>
+`
 };
+};
+
+*/
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -358,19 +406,23 @@ function getImagesSecondEvolution(i) {
         for (let j = 0; j < loadedPokemons[i]['id_second_evolution'].length; j++) {
             if (pokemon[j] < loadedPokemons.length + 1) {
                 content_evolution2.innerHTML += /*html*/`
-                <div id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
-                    <img class="img-evolution-detail" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
+                <div onclick="showDetailsfromEvolution(${pokemon[j] - 1})" id="img_second_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
+                    <img class="img-evolution-detail hover-effect-small" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
                 </div>
             `;
             } else {
                 content_evolution2.innerHTML += /*html*/`
-        <p>Pokemon with ID <b>${pokemon[j]}</b> not yet loaded</p>
+        <p class="evolution-p ${loadedPokemons[i]['types'][0]}">Pokemon with<br>ID <b>${pokemon[j]}</b><br>not yet loaded</p>
             `;
             };
         };
     } else {
+        // document.getElementById('arrow_1').classList.add('d-none');
         content_evolution2.innerHTML += /*html*/`
-            <p>No evolution</p>
+            <div class="container-no-evolution">
+                <p class="no-evolution-p">No evolution</p>
+                <img class="img-no-evolution" src="./img/no-evolution.png" alt="">
+            </div>    
         `;
     };
 };
@@ -387,20 +439,19 @@ function getImagesThirdEvolution(i) {
         for (let j = 0; j < loadedPokemons[i]['id_third_evolution'].length; j++) {
             if (pokemon[j] < loadedPokemons.length + 1) {
                 content_evolution3.innerHTML += /*html*/`
-                <div id="img_third_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
-                    <img class="img-evolution-detail" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
+                <div onclick="showDetailsfromEvolution(${pokemon[j] - 1})" id="img_third_evolution${i}" class="container-img-evolution-detail ${loadedPokemons[pokemon[j] - 1]['types'][0]}">
+                    <img class="img-evolution-detail hover-effect-small" src= "${loadedPokemons[pokemon[j] - 1]['img']}" alt="">   
                 </div>
             `;
             } else {
                 content_evolution3.innerHTML += /*html*/`
-                <p>Pokemon with ID <b>${pokemon[j]}</b> not yet loaded</p>
+                <p class="evolution-p ${loadedPokemons[i]['types'][0]}">Pokemon with<br>ID <b>${pokemon[j]}</b><br>not yet loaded</p>
             `;
             };
         };
     } else {
-        content_evolution3.innerHTML += /*html*/`
-        
-        `;
+        document.getElementById('arrow_2').classList.add('d-none');
+        content_evolution3.classList.add('d-none');
     };
 };
 
