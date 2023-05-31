@@ -248,6 +248,8 @@ function threeTypes(i) {
 
 
 function showDetails(i) {
+    closeDetails();
+
     const content = document.getElementById('singlePokemon');
     content.innerHTML = '';
     content.classList.remove('d-none');
@@ -373,6 +375,7 @@ function templateEvolution(i) {
 
 function showDetailsfromEvolution(i) {
     closeDetails();
+    pushIdandNameToList();
     showDetails(i);
 };
 
@@ -383,9 +386,13 @@ async function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.l
     content_evolution1 = document.getElementById('container_first_evolution');
     content_evolution1.innerHTML = '';
 
+
+
     if (!listOfIds.includes(pokemon)) {
         await loadPokemon(pokemon, pokemon + 1);
     };
+
+    pushIdandNameToList();
 
     const pokemonId = listOfIds.indexOf(pokemon);
 
@@ -401,6 +408,8 @@ async function getImagesSecondEvolution(i) {
     content_evolution2 = document.getElementById('container_second_evolution');
     content_evolution2.innerHTML = '';
 
+
+
     const pokemon = loadedPokemons[i]['id_second_evolution'];
 
     if (pokemon.length > 0) {
@@ -409,7 +418,10 @@ async function getImagesSecondEvolution(i) {
             const element = pokemon[p];
             if (!listOfIds.includes(element)) {
                 await loadPokemon(element, element + 1);
-            }
+            } else {
+                sortPokemon();
+                pushIdandNameToList();
+            };
 
             const pokemonId = listOfIds.indexOf(element);
 
@@ -436,6 +448,7 @@ async function getImagesThirdEvolution(i) {
     content_evolution3 = document.getElementById('container_third_evolution');
     content_evolution3.innerHTML = '';
     const pokemon = loadedPokemons[i]['id_third_evolution'];
+
 
     if (pokemon.length > 0) {
         for (let p = 0; p < pokemon.length; p++) {
@@ -549,10 +562,35 @@ function optionsCanvas() {
 async function randomPokemon() {
     document.getElementById('random_button').disabled = true;
     let randomNumnber = Math.floor(Math.random() * 1000);
-    await loadPokemon(randomNumnber, randomNumnber+1);
+    await loadPokemon(randomNumnber, randomNumnber + 1);
+
+    let toLoad = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_first_evolution'];
+    await loadPokemon(toLoad, toLoad + 1)
+
+    let array = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_second_evolution'];
+    let array2 = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_third_evolution'];
+
+    for (let e = 0; e < array.length; e++) {
+        const element = array[e];
+        await loadPokemon(element, element + 1)
+    };
+
+    for (let e = 0; e < array.length; e++) {
+        const element = array2[e];
+        await loadPokemon(element, element + 1)
+    };
+
     let id = listOfIds.indexOf(randomNumnber);
+    console.log(randomNumnber);
+    console.log(id);
     showDetails(id);
 };
+
+
+
+
+
+
 
 
 
