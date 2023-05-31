@@ -228,7 +228,6 @@ function insertTypes(i, id_div) {
 
 function showDetails(i) {
     closeDetails();
-
     const content = document.getElementById('singlePokemon');
     content.innerHTML = '';
     content.classList.remove('d-none');
@@ -377,13 +376,11 @@ function showDetailsfromEvolution(i) {
 };
 
 
-async function insertFirstEvolution(i) { // logik von pokemon < loadedPokemons.length+1 noch umstellen um einzelne Pokemon laden zu können
+async function insertFirstEvolution(i) {
     const pokemon = loadedPokemons[i]['id_first_evolution'];
 
     content_evolution1 = document.getElementById('container_first_evolution');
     content_evolution1.innerHTML = '';
-
-
 
     if (!listOfIds.includes(pokemon)) {
         await loadPokemon(pokemon, pokemon + 1);
@@ -405,12 +402,9 @@ async function getImagesSecondEvolution(i) {
     content_evolution2 = document.getElementById('container_second_evolution');
     content_evolution2.innerHTML = '';
 
-
-
     const pokemon = loadedPokemons[i]['id_second_evolution'];
 
     if (pokemon.length > 0) {
-
         for (let p = 0; p < pokemon.length; p++) {
             const element = pokemon[p];
             if (!listOfIds.includes(element)) {
@@ -429,7 +423,6 @@ async function getImagesSecondEvolution(i) {
     `;
         };
     } else {
-
         // document.getElementById('arrow_1').classList.add('d-none');
         content_evolution2.innerHTML += /*html*/`
          <div class="container-no-evolution">
@@ -445,7 +438,6 @@ async function getImagesThirdEvolution(i) {
     content_evolution3 = document.getElementById('container_third_evolution');
     content_evolution3.innerHTML = '';
     const pokemon = loadedPokemons[i]['id_third_evolution'];
-
 
     if (pokemon.length > 0) {
         for (let p = 0; p < pokemon.length; p++) {
@@ -488,6 +480,21 @@ function nextPokemon(i) {
     showDetails(i);
 };
 
+
+/* Versuch next and previous Pokemon
+async function previousPokemon(i) {
+    await loadPokemon((listOfIds.indexOf(i+1)), listOfIds.indexOf(i) + 2);
+    i--;
+    showDetails(listOfIds.indexOf(i+1));
+};
+
+
+async function nextPokemon(i) {
+    await loadPokemon((listOfIds.indexOf(i) + 3), listOfIds.indexOf(i) + 4);
+    i++;
+    showDetails(listOfIds.indexOf(i + 1));
+};
+*/
 
 function closeDetails() {
     const content = document.getElementById('singlePokemon');
@@ -556,6 +563,9 @@ function optionsCanvas() {
 };
 
 
+
+// functions for random Pokemon
+
 async function randomPokemon() {
     document.getElementById('random_button').disabled = true;
     let randomNumnber = Math.floor(Math.random() * 1000);
@@ -564,27 +574,41 @@ async function randomPokemon() {
     let toLoad = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_first_evolution'];
     await loadPokemon(toLoad, toLoad + 1)
 
-    let array = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_second_evolution'];
-    let array2 = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_third_evolution'];
-
-    for (let e = 0; e < array.length; e++) {
-        const element = array[e];
-        await loadPokemon(element, element + 1)
-    };
-
-    for (let e = 0; e < array.length; e++) {
-        const element = array2[e];
-        await loadPokemon(element, element + 1)
-    };
+    await randomSecondEvolution(randomNumnber);
+    await randomThirdEvolution(randomNumnber);
 
     let id = listOfIds.indexOf(randomNumnber);
     showDetails(id);
 };
 
+async function randomSecondEvolution(randomNumnber) {
+    let array = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_second_evolution'];
+
+    for (let e = 0; e < array.length; e++) {
+        const element = array[e];
+        await loadPokemon(element, element + 1)
+    };
+};
+
+async function randomThirdEvolution(randomNumnber) {
+    let array = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_third_evolution'];
+
+    for (let e = 0; e < array.length; e++) {
+        const element = array[e];
+        await loadPokemon(element, element + 1)
+    };
+};
 
 
+// Filterfunktion:
 
+function searchPokemon() {
+let search = document.getElementById('input_search').value.toLowerCase();
 
+console.log(search);
+return search
+
+};
 
 
 
