@@ -94,12 +94,8 @@ async function loadPokemon(start, end) {
                 types.push(element['type']['name']);
             };
             pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution);
-        } else {
-            console.log('else');
         };
-
     };
-
     sortPokemon();
     pushIdandNameToList();
     renderPokemonInfo();
@@ -137,7 +133,6 @@ function addLoadButton() {
         <button id="button-load-more" onclick="load20More()" class="btn btn-primary button-load-more">Load more</button>
     `;
 };
-
 
 
 function sortPokemon() {
@@ -190,6 +185,7 @@ function renderPokemonInfo() {
 
     for (let i = 0; i < loadedPokemons.length; i++) {
         content.innerHTML += templatePokemonCard(i);
+        insertTypes(i, `typesCard${i}`);
     };
 };
 
@@ -205,7 +201,8 @@ function templatePokemonCard(i) {
                         <p># ${loadedPokemons[i]['id']}</p>
                     </div>
                     <div class="types">
-                        ${insertTypes(i)}
+                        <div id="typesCard${i}" class="type_container small-350px">
+                        </div>
                     </div>
                     <p class="card-text">${loadedPokemons[i]['description']}</p>
                 </div>
@@ -215,41 +212,17 @@ function templatePokemonCard(i) {
 };
 
 
-function insertTypes(i) {
-    if (loadedPokemons[i]['types'].length == 1) {
-        return oneType(i);
-    } else if (loadedPokemons[i]['types'].length == 2) {
-        return twoTypes(i);
-    } else if (loadedPokemons[i]['types'].length == 3) {
-        return threeTypes(i);
+function insertTypes(i, id_div) {
+    let content = document.getElementById(id_div);
+    content.innerHTML = '';
+
+    for (let t = 0; t < loadedPokemons[i]['types'].length; t++) {
+        const type = loadedPokemons[i]['types'][t];
+
+        content.innerHTML += /*html*/`
+            <p class="type ${type}">${type}</p>
+        `;
     };
-};
-
-
-function oneType(i) {
-    return /*html*/`
-    <div class="type_container small-350px">
-        <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
-    </div>`
-};
-
-
-function twoTypes(i) {
-    return /*html*/`
-    <div class="type_container small-350px">
-        <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
-        <p class="type ${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
-    </div>`
-};
-
-
-function threeTypes(i) {
-    return /*html*/`
-    <div class="type_container small-350px">    
-        <p class="type ${loadedPokemons[i]['types'][0]}">${loadedPokemons[i]['types'][0]}</p>
-        <p class="type ${loadedPokemons[i]['types'][1]}">${loadedPokemons[i]['types'][1]}</p>
-        <p class="type ${loadedPokemons[i]['types'][2]}">${loadedPokemons[i]['types'][3]}</p>
-    </div>`
 };
 
 
@@ -260,6 +233,7 @@ function showDetails(i) {
     content.innerHTML = '';
     content.classList.remove('d-none');
     content.innerHTML = templateDetails(i);
+    insertTypes(i, `typesCardDetail${i}`);
     addCloseWithEscape();
     createCanvas(i);
     insertFirstEvolution(i);
@@ -289,7 +263,8 @@ function templateDetails(i) {
                                 <div class="card_headline_details">
                                     <div class="types-details">
                                         <h5 class="card-title small-headline-350px">${loadedPokemons[i]['name'].slice(0, 1).toUpperCase()}${loadedPokemons[i]['name'].slice(1)}</h5>
-                                        ${insertTypes(i)}
+                                        <div id="typesCardDetail${i}" class="type_container small-350px">
+                                       </div>
                                     </div>
                                     <p class="small-350px"># ${loadedPokemons[i]['id']}</p>
                                 </div>
@@ -377,63 +352,6 @@ function templateRightSideDetails(i) {
 </div>
     `;
 };
-
-
-/* Backup accordion
-
-function templateRightSideDetails(i) {
-    return `
-    <div class="accordion" id="accordionExample">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-          <b>Stats</b>
-        </button>
-      </h2>
-      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          <!-- Nachfolgend Einbettung Graph für Stats -->
-          <div class="stats">
-              <canvas id="myChart"></canvas>
-          </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-          <b>Abilities</b>
-        </button>
-      </h2>
-      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-          Abilities
-      </div>
-      </div>
-    </div>
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-          <b>Evolution</b>
-        </button>
-      </h2>
-      <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-        <div class="accordion-body accordion-body-evolution">
-          ${templateEvolution(i)}
-        </div>
-      </div>
-    </div>
-  </div>
-      `;
-  };
-
-
-*/
-
-
-
-
-
-
 
 
 function templateEvolution(i) {
@@ -660,10 +578,10 @@ async function randomPokemon() {
     };
 
     let id = listOfIds.indexOf(randomNumnber);
-    console.log(randomNumnber);
-    console.log(id);
     showDetails(id);
 };
+
+
 
 
 
