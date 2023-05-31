@@ -22,9 +22,31 @@ let loadedPokemons = [];
 let listOfIds = [];
 let listOfIdsFiltered = [];
 let listOfNames = [];
+let allNames = [];
 
 let start_i = 1;
 let end_i = 21;
+
+
+/* Funktion um ALLE Namen der API zu laden 
+
+*/
+
+
+async function loadAllnamesFromApi() {
+
+    for (let a = 1; a < 1000; a++) {
+    let url = `https://pokeapi.co/api/v2/pokemon/${a}`
+    let response = await fetch(url);
+    let responseAsJson = await response.json();
+
+    allNames.push(responseAsJson['name']);
+    };
+
+};
+
+
+
 
 
 
@@ -113,26 +135,28 @@ async function searchPokemon() {
     loadedPokemons = [];
     let search = document.getElementById('input_search').value.toLowerCase();
 
-    for (let f = 0; f < listOfNames.length; f++) {
-        const name = listOfNames[f];
+    if (typeof search == 'string') {
+        for (let f = 0; f < listOfNames.length; f++) {
+            const name = listOfNames[f];
 
-        if (name.includes(search)) {
-            listOfIdsFiltered.push(listOfNames.indexOf(name) + 1);
+            if (name.includes(search)) {
+                listOfIdsFiltered.push(listOfNames.indexOf(name) + 1);
+            };
         };
+        if (listOfIdsFiltered.length > 0) {
+            for (let l = 0; l < listOfIdsFiltered.length; l++) {
+                const pokemon = listOfIdsFiltered[l];
+                await loadPokemon(pokemon, pokemon + 1);
+            };
+        } else {
+            renderPokemonInfo();
+            // noch html einfügen: "Kein Pokemon gefunden"
+        };
+    } else if (typeof search == 'number') {
+        console.log('number!')
     };
-
-    for (let l = 0; l < listOfIdsFiltered.length; l++) {
-        const pokemon = listOfIdsFiltered[l];
-
-        await loadPokemon(pokemon, pokemon + 1);
-    };
-
-
-
-    
     console.log(search);
     console.log(listOfIdsFiltered);
-
 };
 
 
@@ -145,7 +169,6 @@ async function deleteSearch() {
     loadedPokemons = [];
     await loadPokemon(start_i, end_i);
 };
-
 
 
 function checkLanguage(responseDescriptionAsJson) {
@@ -606,7 +629,6 @@ function optionsCanvas() {
         }
     }
 };
-
 
 
 // functions for random Pokemon
