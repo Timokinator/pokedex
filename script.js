@@ -87,12 +87,7 @@ async function loadPokemon(start, end) {
                 };
             };
 
-            for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
-                let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
-                if (language == 'en') {
-                    description = responseDescriptionAsJson['flavor_text_entries'][j]['flavor_text'];
-                };
-            };
+            checkLanguage(responseDescriptionAsJson);
 
             for (let t = 0; t < responseAsJson['types'].length; t++) {
                 const element = responseAsJson['types'][t];
@@ -108,6 +103,17 @@ async function loadPokemon(start, end) {
     sortPokemon();
     pushIdandNameToList();
     renderPokemonInfo();
+};
+
+
+function checkLanguage(responseDescriptionAsJson) {
+    for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
+        let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
+        if (language == 'en') {
+            description = responseDescriptionAsJson['flavor_text_entries'][j]['flavor_text'];
+            return description
+        };
+    };
 };
 
 
@@ -314,6 +320,7 @@ function templateButtonsDetails(i) {
 function templateRightSideDetails(i) {
     return /*html*/`
 <div class="accordion" id="accordionExample">
+
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
@@ -328,6 +335,20 @@ function templateRightSideDetails(i) {
         </div>
     </div>
   </div>
+
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+        <b>Description</b>
+      </button>
+    </h2>
+    <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p class="card-text">${loadedPokemons[i]['description']}</p>
+    </div>
+    </div>
+  </div>
+
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -340,6 +361,7 @@ function templateRightSideDetails(i) {
     </div>
     </div>
   </div>
+
   <div class="accordion-item">
     <h2 class="accordion-header">
       <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -355,6 +377,63 @@ function templateRightSideDetails(i) {
 </div>
     `;
 };
+
+
+/* Backup accordion
+
+function templateRightSideDetails(i) {
+    return `
+    <div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+          <b>Stats</b>
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <!-- Nachfolgend Einbettung Graph für Stats -->
+          <div class="stats">
+              <canvas id="myChart"></canvas>
+          </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          <b>Abilities</b>
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          Abilities
+      </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+          <b>Evolution</b>
+        </button>
+      </h2>
+      <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body accordion-body-evolution">
+          ${templateEvolution(i)}
+        </div>
+      </div>
+    </div>
+  </div>
+      `;
+  };
+
+
+*/
+
+
+
+
+
+
 
 
 function templateEvolution(i) {
