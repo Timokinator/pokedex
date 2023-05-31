@@ -20,6 +20,7 @@ const borderColorCanvas = [
 
 let loadedPokemons = [];
 let listOfIds = [];
+let listOfIdsFiltered = [];
 let listOfNames = [];
 
 let start_i = 1;
@@ -102,6 +103,51 @@ async function loadPokemon(start, end) {
 };
 
 
+// Filterfunktion:
+
+async function searchPokemon() {
+    toggleLoadButton(0);
+    document.getElementById("button_search").disabled = true;
+    listOfIdsFiltered = [];
+    listOfIds = [];
+    loadedPokemons = [];
+    let search = document.getElementById('input_search').value.toLowerCase();
+
+    for (let f = 0; f < listOfNames.length; f++) {
+        const name = listOfNames[f];
+
+        if (name.includes(search)) {
+            listOfIdsFiltered.push(listOfNames.indexOf(name) + 1);
+        };
+    };
+
+    for (let l = 0; l < listOfIdsFiltered.length; l++) {
+        const pokemon = listOfIdsFiltered[l];
+
+        await loadPokemon(pokemon, pokemon + 1);
+    };
+
+
+
+    
+    console.log(search);
+    console.log(listOfIdsFiltered);
+
+};
+
+
+async function deleteSearch() {
+    document.getElementById('input_search').value = '';
+    document.getElementById("button_search").disabled = false;
+    toggleLoadButton(0);
+    listOfIds = [];
+    listOfIdsFiltered = [];
+    loadedPokemons = [];
+    await loadPokemon(start_i, end_i);
+};
+
+
+
 function checkLanguage(responseDescriptionAsJson) {
     for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
         let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
@@ -115,9 +161,8 @@ function checkLanguage(responseDescriptionAsJson) {
 
 function load20More() {
     toggleLoadButton(0);
-    start_i = end_i;
     end_i += 20;
-    loadPokemon(start_i, end_i);
+    loadPokemon(end_i - 20, end_i);
     toggleLoadButton(5000);
 };
 
@@ -600,15 +645,7 @@ async function randomThirdEvolution(randomNumnber) {
 };
 
 
-// Filterfunktion:
 
-function searchPokemon() {
-let search = document.getElementById('input_search').value.toLowerCase();
-
-console.log(search);
-return search
-
-};
 
 
 
