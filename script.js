@@ -30,12 +30,16 @@ let end_i = 21;
 
 /* Funktion um ALLE Namen der API zu laden 
 
+
+
+
+
 */
 
 
 async function loadAllnamesFromApi() {
 
-    for (let a = 1; a < 1000; a++) {
+    for (let a = 1; a < 1009; a++) {
     let url = `https://pokeapi.co/api/v2/pokemon/${a}`
     let response = await fetch(url);
     let responseAsJson = await response.json();
@@ -155,8 +159,6 @@ async function searchPokemon() {
     } else if (typeof search == 'number') {
         console.log('number!')
     };
-    console.log(search);
-    console.log(listOfIdsFiltered);
 };
 
 
@@ -353,6 +355,7 @@ function templateButtonsDetails(i) {
     return /*html*/`
     <div class="btn-container-detail">
       <button class="btn-detail hover-effect ${loadedPokemons[i]['types'][0]}" onclick="previousPokemon(${i}); onclick=doNotClose(event)"><-</button>
+      <button class="btn-detail btn btn-danger hover-effect" onclick="closeDetails()">X</button>
       <button class="btn-detail hover-effect ${loadedPokemons[i]['types'][0]}" onclick="nextPokemon(${i}); onclick=doNotClose(event)">-></button>
    </div>
     `;
