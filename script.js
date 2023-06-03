@@ -28,25 +28,17 @@ let start_i = 1;
 let end_i = 21;
 
 
-/* Funktion um ALLE Namen der API zu laden 
+// Funktion um ALLE Namen der API zu laden 
 
-
-
-
-
-*/
-
-
-async function loadAllnamesFromApi() {
+async function loadAllnamesFromApi() { // atm not included...adds the possibility to load the names of all pokemon from the API
 
     for (let a = 1; a < 1009; a++) {
-    let url = `https://pokeapi.co/api/v2/pokemon/${a}`
-    let response = await fetch(url);
-    let responseAsJson = await response.json();
+        let url = `https://pokeapi.co/api/v2/pokemon/${a}`
+        let response = await fetch(url);
+        let responseAsJson = await response.json();
 
-    allNames.push(responseAsJson['name']);
+        allNames.push(responseAsJson['name']);
     };
-
 };
 
 
@@ -131,7 +123,58 @@ async function loadPokemon(start, end) {
 
 // Filterfunktion:
 
-async function searchPokemon() {
+async function searchPokemon() { //
+    toggleLoadButton(0);
+    document.getElementById("button_search").disabled = true;
+    loadedPokemons = [];
+    renderPokemonInfo();
+    let search = document.getElementById('input_search').value.toLowerCase();
+    listOfIdsFiltered = [];
+
+    for (let f = 0; f < listOfNames.length; f++) {
+        const name = listOfNames[f];
+
+        if (name.includes(search)) {
+            listOfIdsFiltered.push(listOfNames.indexOf(name) + 1);
+        };
+    };
+    for (let f = 0; f < listOfIds.length; f++) {
+        let number = listOfIds[f];
+
+        if (number.toString().includes(search)) {
+            listOfIdsFiltered.push(listOfIds.indexOf(number) + 1);
+        };
+    }
+    listOfIds = [];
+    if (listOfIdsFiltered.length > 0) {
+        for (let l = 0; l < listOfIdsFiltered.length; l++) {
+            const pokemon = listOfIdsFiltered[l];
+            await loadPokemon(pokemon, pokemon + 1);
+        };
+    } else {
+        const content = document.getElementById('pokedex');
+        content.innerHTML += /*html*/`
+            <div class="no-pokemon">
+                <h2>No Pokemon found - try again</h2>
+            </div>
+        `;
+
+    };
+};
+
+
+// function to check if search-field value contains only numbers
+
+function containsOnlyNumbers(str) {
+    return /^[0-9]+$/.test(str);
+};
+
+
+
+
+/* backup search function
+
+async function searchPokemon() { //
     toggleLoadButton(0);
     document.getElementById("button_search").disabled = true;
     listOfIdsFiltered = [];
@@ -162,6 +205,18 @@ async function searchPokemon() {
 };
 
 
+*/
+
+
+
+
+
+
+
+
+
+
+
 async function deleteSearch() {
     document.getElementById('input_search').value = '';
     document.getElementById("button_search").disabled = false;
@@ -184,11 +239,11 @@ function checkLanguage(responseDescriptionAsJson) {
 };
 
 
-function load20More() {
+async function load20More() {
     toggleLoadButton(0);
     end_i += 20;
-    loadPokemon(end_i - 20, end_i);
-    toggleLoadButton(5000);
+    await loadPokemon(end_i - 20, end_i);
+    toggleLoadButton(1000);
 };
 
 
@@ -311,7 +366,7 @@ function showDetails(i) {
 };
 
 
-function addCloseWithEscape() {
+function addCloseWithEscape() { //adds the possibility to close the details with the escape-key
     window.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
             closeDetails();
