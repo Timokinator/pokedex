@@ -123,7 +123,8 @@ async function loadPokemon(start, end) {
 
 // Filterfunktion:
 
-async function searchPokemon() { //
+async function searchPokemon() {
+    event.preventDefault();
     toggleLoadButton(0);
     document.getElementById("button_search").disabled = true;
     loadedPokemons = [];
@@ -135,14 +136,15 @@ async function searchPokemon() { //
         const name = listOfNames[f];
 
         if (name.includes(search)) {
-            listOfIdsFiltered.push(listOfNames.indexOf(name) + 1);
+            listOfIdsFiltered.push(listOfIds[listOfNames.indexOf(name)]);
         };
     };
+    listOfNames = [];
     for (let f = 0; f < listOfIds.length; f++) {
-        let number = listOfIds[f];
+        const number = listOfIds[f];
 
         if (number.toString().includes(search)) {
-            listOfIdsFiltered.push(listOfIds.indexOf(number) + 1);
+            listOfIdsFiltered.push(listOfIds[listOfIds.indexOf(number)]);
         };
     }
     listOfIds = [];
@@ -153,12 +155,12 @@ async function searchPokemon() { //
         };
     } else {
         const content = document.getElementById('pokedex');
+        content.innerHTML = "";
         content.innerHTML += /*html*/`
             <div class="no-pokemon">
-                <h2>No Pokemon found - try again</h2>
+                <h3>No Pokemon found - try again</h3>
             </div>
         `;
-
     };
 };
 
@@ -703,7 +705,10 @@ async function randomPokemon() {
     await randomThirdEvolution(randomNumnber);
 
     let id = listOfIds.indexOf(randomNumnber);
+    pushIdandNameToList();
+    renderPokemonInfo();
     showDetails(id);
+    
 };
 
 async function randomSecondEvolution(randomNumnber) {

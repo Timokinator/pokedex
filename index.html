@@ -24,14 +24,15 @@
         <nav>
             <button id="random_button" onclick="randomPokemon()" class="word-break btn btn-dark hover-effect">Random
                 Pokémon</button>
-            <div class="input-and-buttons">
-                <input id="input_search" class="input-search" placeholder="Name or ID..." type="text">
+            <form onsubmit="searchPokemon()" class="input-and-buttons">
+                <input id="input_search" required title="Please fill in name or ID"
+                    oninvalid="this.setCustomValidity('Enter name or ID')" oninput="setCustomValidity('')"
+                    class="input-search" placeholder="Name or ID..." type="text">
                 <div class="left-buttons-nav">
-                    <button id="button_search" onclick="searchPokemon()"
-                        class="btn btn-success hover-effect">Search</button>
-                    <button onclick="deleteSearch()" class="btn btn-danger hover-effect">Delete</button>
+                    <input type="submit" id="button_search" value="Suchen" class="btn btn-success hover-effect">
+                    <button type="button" onclick="deleteSearch()" class="btn btn-danger hover-effect">Delete</button>
                 </div>
-            </div>
+            </form>
         </nav>
 
     </header>

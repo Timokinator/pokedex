@@ -87,6 +87,7 @@ nav {
     color: white;
     display: flex;
     max-width: 99%;
+    width: 100%;
 }
 
 .info-container {
