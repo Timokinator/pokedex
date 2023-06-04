@@ -23,14 +23,15 @@ let listOfIds = [];
 let listOfIdsFiltered = [];
 let listOfNames = [];
 let allNames = [];
+let allIds = [];
 
 let start_i = 1;
 let end_i = 21;
 
 
-// Funktion um ALLE Namen der API zu laden 
+// Funktion um ALLE Namen + IDs der API zu laden 
 
-async function loadAllnamesFromApi() { // atm not included...adds the possibility to load the names of all pokemon from the API
+async function loadAllnamesAndIdsFromApi() { // atm not included...adds the possibility to load the names and IDs of all pokemon from the API
 
     for (let a = 1; a < 1009; a++) {
         let url = `https://pokeapi.co/api/v2/pokemon/${a}`
@@ -38,8 +39,33 @@ async function loadAllnamesFromApi() { // atm not included...adds the possibilit
         let responseAsJson = await response.json();
 
         allNames.push(responseAsJson['name']);
+        allIds.push(responseAsJson)['id'];
     };
 };
+
+
+function fillAllIds() {
+
+    for (let i = 1; i < 1009; i++) {
+        allIds.push(i);
+    };
+};
+
+
+async function fillAllnames() {
+    allNames = await Promise.all(
+        allIds.map(async id => {
+            const res = await fetch(
+                `https://pokeapi.co/api/v2/pokemon/${id}`
+
+            );
+            return await res.json();
+ 
+        })
+    );
+    
+};
+
 
 
 
@@ -86,6 +112,12 @@ async function loadPokemon(start, end) {
             let abilities = [];
 
 
+            abilities = await getAbilities(responseAsJson['abilities']);
+
+
+
+
+
             let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
 
             for (let e = 0; e < possibleSecondEvolutions.length; e++) {
@@ -114,7 +146,7 @@ async function loadPokemon(start, end) {
                 const element = responseAsJson['types'][t];
                 types.push(element['type']['name']);
             };
-            pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution);
+            pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities);
         };
     };
     sortPokemon();
@@ -122,6 +154,36 @@ async function loadPokemon(start, end) {
     renderPokemonInfo();
 };
 
+
+async function getAbilities(abilitiesArray) {
+    let listOfAbilities = [];
+    for (let a = 0; a < abilitiesArray.length; a++) {
+        const element = abilitiesArray[a];
+        let url = element['ability']['url'];
+        let response = await fetch(url);
+        let responseAsJson = await response.json();
+        await checkLanguageAbilities(responseAsJson)
+        listOfAbilities.push(
+            {
+                'ability_name': element['ability']['name'],
+                'ability_url': element['ability']['url'],
+                'short_effect': short_effect
+            }
+        );
+    };
+    return listOfAbilities;
+};
+
+
+function checkLanguageAbilities(responseAsJson) {
+    for (let j = 0; j < responseAsJson['effect_entries'].length; j++) {
+        let language = responseAsJson['effect_entries'][j]['language']['name'];
+        if (language == 'en') {
+            short_effect = responseAsJson['effect_entries'][j]['short_effect'];
+            return short_effect;
+        };
+    };
+};
 
 
 
@@ -178,53 +240,6 @@ async function searchPokemon() {
 function containsOnlyNumbers(str) {
     return /^[0-9]+$/.test(str);
 };
-
-
-
-
-/* backup search function
-
-async function searchPokemon() { //
-    toggleLoadButton(0);
-    document.getElementById("button_search").disabled = true;
-    listOfIdsFiltered = [];
-    listOfIds = [];
-    loadedPokemons = [];
-    let search = document.getElementById('input_search').value.toLowerCase();
-
-    if (typeof search == 'string') {
-        for (let f = 0; f < listOfNames.length; f++) {
-            const name = listOfNames[f];
-
-            if (name.includes(search)) {
-                listOfIdsFiltered.push(listOfNames.indexOf(name) + 1);
-            };
-        };
-        if (listOfIdsFiltered.length > 0) {
-            for (let l = 0; l < listOfIdsFiltered.length; l++) {
-                const pokemon = listOfIdsFiltered[l];
-                await loadPokemon(pokemon, pokemon + 1);
-            };
-        } else {
-            renderPokemonInfo();
-            // noch html einfügen: "Kein Pokemon gefunden"
-        };
-    } else if (typeof search == 'number') {
-        console.log('number!')
-    };
-};
-
-
-*/
-
-
-
-
-
-
-
-
-
 
 
 async function deleteSearch() {
@@ -289,7 +304,7 @@ function pushIdandNameToList() {
 };
 
 
-function pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution) {
+function pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities) {
     loadedPokemons.push(
         {
             'name': name,
@@ -308,7 +323,8 @@ function pushToJson(i, name, id, img, hp, attack, defense, special_attack, speci
             'weight': weight,
             'height': height,
             'i': i,
-            'description': description
+            'description': description,
+            'abilities': abilities
         }
     );
 };
@@ -370,6 +386,7 @@ function showDetails(i) {
     insertTypes(i, `typesCardDetail${i}`);
     addCloseWithEscape();
     createCanvas(i);
+    renderAbilities(i);
     insertFirstEvolution(i);
     getImagesSecondEvolution(i);
     getImagesThirdEvolution(i);
@@ -467,7 +484,7 @@ function templateRightSideDetails(i) {
     </h2>
     <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
       <div class="accordion-body">
-        Abilities
+        <div id="container_abilities" class="container-abilities"></div>
     </div>
     </div>
   </div>
@@ -485,6 +502,28 @@ function templateRightSideDetails(i) {
     </div>
   </div>
 </div>
+    `;
+};
+
+
+function renderAbilities(i) {
+    let content = document.getElementById('container_abilities')
+
+    content.innerHTML = '';
+
+    for (let a = 0; a < loadedPokemons[i]['abilities'].length; a++) {
+        const ability = loadedPokemons[i]['abilities'][a];
+        content.innerHTML += templateAbilities(ability);
+    };
+};
+
+
+function templateAbilities(ability) {
+    return /*html*/`
+        <div class="container-single-ability">
+            <h5>${ability['ability_name'].slice(0, 1).toUpperCase()}${ability['ability_name'].slice(1)}:</h5>
+            <p>${ability['short_effect']}</p>
+        </div>
     `;
 };
 
@@ -617,21 +656,6 @@ function nextPokemon(i) {
 };
 
 
-/* Versuch next and previous Pokemon
-async function previousPokemon(i) {
-    await loadPokemon((listOfIds.indexOf(i+1)), listOfIds.indexOf(i) + 2);
-    i--;
-    showDetails(listOfIds.indexOf(i+1));
-};
-
-
-async function nextPokemon(i) {
-    await loadPokemon((listOfIds.indexOf(i) + 3), listOfIds.indexOf(i) + 4);
-    i++;
-    showDetails(listOfIds.indexOf(i + 1));
-};
-*/
-
 function closeDetails() {
     const content = document.getElementById('singlePokemon');
     content.innerHTML = '';
@@ -716,7 +740,7 @@ async function randomPokemon() {
     pushIdandNameToList();
     renderPokemonInfo();
     showDetails(id);
-    
+
 };
 
 async function randomSecondEvolution(randomNumnber) {

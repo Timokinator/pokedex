@@ -192,7 +192,7 @@ nav {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 64px;
+    gap: 12%;
     margin-top: 2%;
     margin-left: 8%;
     margin-right: 8%;
@@ -203,6 +203,7 @@ nav {
     padding: 8px;
     width: 64px;
     aspect-ratio: 1 / 1;
+    white-space: nowrap;
 }
 
 .btn-detail {
@@ -515,7 +516,7 @@ footer {
     }
 
     .img-details {
-        width: 50%;
+        width: 35%;
     }
 
 
