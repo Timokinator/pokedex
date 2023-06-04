@@ -83,6 +83,8 @@ async function loadPokemon(start, end) {
             let id_third_evolution = [];
             let weight = responseAsJson['weight'];
             let height = responseAsJson['height'];
+            let abilities = [];
+
 
             let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
 
@@ -121,10 +123,16 @@ async function loadPokemon(start, end) {
 };
 
 
+
+
+
+
+
+
+
 // Filterfunktion:
 
 async function searchPokemon() {
-    event.preventDefault();
     toggleLoadButton(0);
     document.getElementById("button_search").disabled = true;
     loadedPokemons = [];

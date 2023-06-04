@@ -24,7 +24,7 @@
         <nav>
             <button id="random_button" onclick="randomPokemon()" class="word-break btn btn-dark hover-effect">Random
                 Pokémon</button>
-            <form onsubmit="searchPokemon()" class="input-and-buttons">
+            <form onsubmit="searchPokemon(); return false" class="input-and-buttons">
                 <input id="input_search" required title="Please fill in name or ID"
                     oninvalid="this.setCustomValidity('Enter name or ID')" oninput="setCustomValidity('')"
                     class="input-search" placeholder="Name or ID..." type="text">
