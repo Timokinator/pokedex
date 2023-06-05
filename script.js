@@ -22,27 +22,16 @@ let loadedPokemons = [];
 let listOfIds = [];
 let listOfIdsFiltered = [];
 let listOfNames = [];
-let allNames = [];
+let allPokemon = [];
+let allSpecies = [];
+let evolutionChain = [];
 let allIds = [];
 
-let start_i = 1;
+let start_i = 0;
 let end_i = 21;
 
 
 // Funktion um ALLE Namen + IDs der API zu laden 
-
-async function loadAllnamesAndIdsFromApi() { // atm not included...adds the possibility to load the names and IDs of all pokemon from the API
-
-    for (let a = 1; a < 1009; a++) {
-        let url = `https://pokeapi.co/api/v2/pokemon/${a}`
-        let response = await fetch(url);
-        let responseAsJson = await response.json();
-
-        allNames.push(responseAsJson['name']);
-        allIds.push(responseAsJson)['id'];
-    };
-};
-
 
 function fillAllIds() {
 
@@ -52,29 +41,176 @@ function fillAllIds() {
 };
 
 
-async function fillAllnames() {
-    allNames = await Promise.all(
+async function fillAllPokemon() {
+    allPokemon = await Promise.all(
         allIds.map(async id => {
             const res = await fetch(
                 `https://pokeapi.co/api/v2/pokemon/${id}`
-
             );
             return await res.json();
- 
         })
     );
-    
+};
+
+
+async function getAllSpecies() {
+    allSpecies = await Promise.all(
+        allIds.map(async id => {
+            const res = await fetch(
+                `https://pokeapi.co/api/v2/pokemon-species/${id}/`
+            );
+            return await res.json();
+        })
+    );
+};
+
+
+async function getAllEvolution() {
+    evolutionChain = await Promise.all(
+        allIds.map(async id => {
+            const res = await fetch(
+                `https://pokeapi.co/api/v2/pokemon-species/${id}/`
+            );
+            return await res.json();
+        })
+    );
+};
+
+
+async function fillJson() {
+
+    for (let i = start_i; i < end_i; i++) {
+        const pokemon = allPokemon[i];
+        const species = allSpecies[i];
+
+        let name = pokemon['name'];
+        let id = pokemon['id'];
+        let img = pokemon['sprites']['other']['official-artwork']['front_default'];
+        let hp = pokemon['stats'][0]['base_stat'];
+        let attack = pokemon['stats'][1]['base_stat'];
+        let defense = pokemon['stats'][2]['base_stat'];
+        let special_attack = pokemon['stats'][3]['base_stat'];
+        let special_defense = pokemon['stats'][4]['base_stat'];
+        let speed = pokemon['stats'][5]['base_stat'];
+        let weight = pokemon['weight'];
+        let height = pokemon['height'];
+        let id_second_evolution = [];
+        let id_third_evolution = [];
+        let id_first_evolution = await getFirstEvolution(species);
+        let abilities = await getAbilities(pokemon);
+
+        let types = getTypes(pokemon);
+        checkLanguage(allSpecies[i])
+
+        let url_evolutionChain = species['evolution_chain']['url'];
+        let responseEvolutionChain = await fetch(url_evolutionChain);
+        let responseEvolutionChainAsJson = await responseEvolutionChain.json();
+
+        let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
+
+        for (let e = 0; e < possibleSecondEvolutions.length; e++) {
+            let urlSecondEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['species']['url'];
+            let responseSecondEvolution = await fetch(urlSecondEvolution);
+            let responseSecondEvolutionAsJson = await responseSecondEvolution.json();
+            let idSecondEvolution = responseSecondEvolutionAsJson['id'];
+
+            id_second_evolution.push(idSecondEvolution);
+
+            let possibleThirdEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'];
+
+            for (let f = 0; f < possibleThirdEvolutions.length; f++) {
+                let urlThirdEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'][f]['species']['url'];
+                let responseThirdEvolution = await fetch(urlThirdEvolution);
+                let responseThirdEvolutionAsJson = await responseThirdEvolution.json();
+                let idThirdEvolution = responseThirdEvolutionAsJson['id'];
+
+                id_third_evolution.push(idThirdEvolution);
+            };
+        };
+
+        pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities);
+        renderPokemonInfo();
+
+    };
+
+
 };
 
 
 
 
 
+async function getFirstEvolution(species) {
+    let url_evolutionChain = species['evolution_chain']['url'];
+    let responseEvolutionChain = await fetch(url_evolutionChain);
+    let responseEvolutionChainAsJson = await responseEvolutionChain.json();
+
+    let urlFirstEvolution = responseEvolutionChainAsJson['chain']['species']['url'];
+    let responseFirstEvolution = await fetch(urlFirstEvolution);
+    let responseFirstEvolutionAsJson = await responseFirstEvolution.json();
+    let id_first_evolution = responseFirstEvolutionAsJson['id'];
+
+    return id_first_evolution;
+}
+
+
+async function getAbilities(pokemon) {
+    let listOfAbilities = [];
+    for (let a = 0; a < pokemon['abilities'].length; a++) {
+        const element = pokemon['abilities'][a];
+        let url = element['ability']['url'];
+        let response = await fetch(url);
+        let responseAsJson = await response.json();
+        await checkLanguageAbilities(responseAsJson)
+        listOfAbilities.push(
+            {
+                'ability_name': element['ability']['name'],
+                'ability_url': element['ability']['url'],
+                'short_effect': short_effect
+            }
+        );
+    };
+    return listOfAbilities;
+};
+
+
+function checkLanguageAbilities(responseAsJson) {
+    for (let j = 0; j < responseAsJson['effect_entries'].length; j++) {
+        let language = responseAsJson['effect_entries'][j]['language']['name'];
+        if (language == 'en') {
+            short_effect = responseAsJson['effect_entries'][j]['short_effect'];
+            return short_effect;
+        };
+    };
+};
+
+
+function getTypes(pokemon) {
+    let types = [];
+    for (let t = 0; t < pokemon['types'].length; t++) {
+        const type = pokemon['types'][t];
+        types.push(type['type']['name']);
+    };
+    return types;
+};
+
+
+function checkLanguage(Species) {
+    for (let j = 0; j < Species['flavor_text_entries'].length; j++) {
+        let language = Species['flavor_text_entries'][j]['language']['name'];
+        if (language == 'en') {
+            description = Species['flavor_text_entries'][j]['flavor_text'];
+            return description
+        };
+    };
+};
+
+
 
 
 async function loadPokemon(start, end) {
 
-    for (let i = start; i < end; i++) {
+    for (let i = start + 1; i < end; i++) {
 
         if (!listOfIds.includes(i)) {
 
@@ -112,7 +248,7 @@ async function loadPokemon(start, end) {
             let abilities = [];
 
 
-            abilities = await getAbilities(responseAsJson['abilities']);
+            // abilities = await getAbilities(responseAsJson['abilities']);
 
 
 
@@ -155,35 +291,9 @@ async function loadPokemon(start, end) {
 };
 
 
-async function getAbilities(abilitiesArray) {
-    let listOfAbilities = [];
-    for (let a = 0; a < abilitiesArray.length; a++) {
-        const element = abilitiesArray[a];
-        let url = element['ability']['url'];
-        let response = await fetch(url);
-        let responseAsJson = await response.json();
-        await checkLanguageAbilities(responseAsJson)
-        listOfAbilities.push(
-            {
-                'ability_name': element['ability']['name'],
-                'ability_url': element['ability']['url'],
-                'short_effect': short_effect
-            }
-        );
-    };
-    return listOfAbilities;
-};
 
 
-function checkLanguageAbilities(responseAsJson) {
-    for (let j = 0; j < responseAsJson['effect_entries'].length; j++) {
-        let language = responseAsJson['effect_entries'][j]['language']['name'];
-        if (language == 'en') {
-            short_effect = responseAsJson['effect_entries'][j]['short_effect'];
-            return short_effect;
-        };
-    };
-};
+
 
 
 
@@ -253,15 +363,7 @@ async function deleteSearch() {
 };
 
 
-function checkLanguage(responseDescriptionAsJson) {
-    for (let j = 0; j < responseDescriptionAsJson['flavor_text_entries'].length; j++) {
-        let language = responseDescriptionAsJson['flavor_text_entries'][j]['language']['name'];
-        if (language == 'en') {
-            description = responseDescriptionAsJson['flavor_text_entries'][j]['flavor_text'];
-            return description
-        };
-    };
-};
+
 
 
 async function load20More() {
