@@ -28,7 +28,7 @@ let evolutionChain = [];
 let allIds = [];
 
 let start_i = 0;
-let end_i = 21;
+let end_i = 20;
 
 
 // Funktion um ALLE Namen + IDs der API zu laden 
@@ -77,9 +77,22 @@ async function getAllEvolution() {
 };
 
 
-async function fillJson() {
+async function getStarted() {
+    await fillAllIds();
+    await fillAllPokemon();
+    await getAllSpecies();
+    await fillJson(start_i, end_i);
+    renderPokemonInfo();
+};
 
-    for (let i = start_i; i < end_i; i++) {
+
+
+async function fillJson(start, end) {
+
+    for (let i = start; i <= end; i++) {
+
+
+
         const pokemon = allPokemon[i];
         const species = allSpecies[i];
 
@@ -129,6 +142,9 @@ async function fillJson() {
         };
 
         pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities);
+
+        sortPokemon();
+        pushIdandNameToList();
         renderPokemonInfo();
 
     };
@@ -208,7 +224,7 @@ function checkLanguage(Species) {
 
 
 
-async function loadPokemon(start, end) {
+/* async function loadPokemon(start, end) {
 
     for (let i = start + 1; i < end; i++) {
 
@@ -288,7 +304,7 @@ async function loadPokemon(start, end) {
     sortPokemon();
     pushIdandNameToList();
     renderPokemonInfo();
-};
+}; */
 
 
 
@@ -368,8 +384,9 @@ async function deleteSearch() {
 
 async function load20More() {
     toggleLoadButton(0);
+    start_i += 20;
     end_i += 20;
-    await loadPokemon(end_i - 20, end_i);
+    await fillJson(start_i + 1, end_i);
     toggleLoadButton(1000);
 };
 
@@ -660,7 +677,7 @@ async function insertFirstEvolution(i) {
     content_evolution1.innerHTML = '';
 
     if (!listOfIds.includes(pokemon)) {
-        await loadPokemon(pokemon, pokemon + 1);
+        await fillJson(pokemon - 1, pokemon - 1);
     };
 
     pushIdandNameToList();
@@ -685,7 +702,7 @@ async function getImagesSecondEvolution(i) {
         for (let p = 0; p < pokemon.length; p++) {
             const element = pokemon[p];
             if (!listOfIds.includes(element)) {
-                await loadPokemon(element, element + 1);
+                await fillJson(element - 1, element - 1);
             } else {
                 sortPokemon();
                 pushIdandNameToList();
@@ -720,7 +737,10 @@ async function getImagesThirdEvolution(i) {
         for (let p = 0; p < pokemon.length; p++) {
             const element = pokemon[p];
             if (!listOfIds.includes(element)) {
-                await loadPokemon(element, element + 1);
+                await fillJson(element - 1, element - 1);
+            } else {
+                sortPokemon();
+                pushIdandNameToList();
             };
 
             const pokemonId = listOfIds.indexOf(element);
@@ -830,10 +850,10 @@ function optionsCanvas() {
 async function randomPokemon() {
     document.getElementById('random_button').disabled = true;
     let randomNumnber = Math.floor(Math.random() * 1000);
-    await loadPokemon(randomNumnber, randomNumnber + 1);
+    await fillJson(randomNumnber - 1, randomNumnber - 1);
 
-    let toLoad = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_first_evolution'];
-    await loadPokemon(toLoad, toLoad + 1)
+    let toLoad = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_first_evolution']; //noch prüfen ob random bereits erste evolution
+    await fillJson(toLoad - 1, toLoad - 1);
 
     await randomSecondEvolution(randomNumnber);
     await randomThirdEvolution(randomNumnber);
@@ -850,7 +870,7 @@ async function randomSecondEvolution(randomNumnber) {
 
     for (let e = 0; e < array.length; e++) {
         const element = array[e];
-        await loadPokemon(element, element + 1)
+        await fillJson(element - 1, element - 1)
     };
 };
 
