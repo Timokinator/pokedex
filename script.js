@@ -22,6 +22,7 @@ let loadedPokemons = [];
 let listOfIds = [];
 let listOfIdsFiltered = [];
 let listOfNames = [];
+let listOfAllNames = [];
 let allPokemon = [];
 let allSpecies = [];
 let evolutionChain = [];
@@ -37,6 +38,15 @@ function fillAllIds() {
 
     for (let i = 1; i < 1009; i++) {
         allIds.push(i);
+    };
+};
+
+
+function fillAllNames() {
+    for (let i = 0; i < allPokemon.length; i++) {
+        const name = allPokemon[i]['name'];
+
+        listOfAllNames.push(name);
     };
 };
 
@@ -80,80 +90,82 @@ async function getAllEvolution() {
 async function getStarted() {
     await fillAllIds();
     await fillAllPokemon();
+    await fillAllNames();
     await getAllSpecies();
     await fillJson(start_i, end_i);
-    renderPokemonInfo();
+    await renderPokemonInfo();
+    toggleLoadButton(0);
+    enableButtons();
 };
 
+
+function enableButtons() {
+    document.getElementById('random_button').disabled = false;
+    document.getElementById('button_search').disabled = false;
+    document.getElementById('delete_search').disabled = false;
+};
 
 
 async function fillJson(start, end) {
 
     for (let i = start; i <= end; i++) {
 
+        if (!listOfIds.includes(i + 1)) {
 
+            const pokemon = allPokemon[i];
+            const species = allSpecies[i];
 
-        const pokemon = allPokemon[i];
-        const species = allSpecies[i];
+            let name = pokemon['name'];
+            let id = pokemon['id'];
+            let img = pokemon['sprites']['other']['official-artwork']['front_default'];
+            let hp = pokemon['stats'][0]['base_stat'];
+            let attack = pokemon['stats'][1]['base_stat'];
+            let defense = pokemon['stats'][2]['base_stat'];
+            let special_attack = pokemon['stats'][3]['base_stat'];
+            let special_defense = pokemon['stats'][4]['base_stat'];
+            let speed = pokemon['stats'][5]['base_stat'];
+            let weight = pokemon['weight'];
+            let height = pokemon['height'];
+            let id_second_evolution = [];
+            let id_third_evolution = [];
+            let id_first_evolution = await getFirstEvolution(species);
+            let abilities = await getAbilities(pokemon);
 
-        let name = pokemon['name'];
-        let id = pokemon['id'];
-        let img = pokemon['sprites']['other']['official-artwork']['front_default'];
-        let hp = pokemon['stats'][0]['base_stat'];
-        let attack = pokemon['stats'][1]['base_stat'];
-        let defense = pokemon['stats'][2]['base_stat'];
-        let special_attack = pokemon['stats'][3]['base_stat'];
-        let special_defense = pokemon['stats'][4]['base_stat'];
-        let speed = pokemon['stats'][5]['base_stat'];
-        let weight = pokemon['weight'];
-        let height = pokemon['height'];
-        let id_second_evolution = [];
-        let id_third_evolution = [];
-        let id_first_evolution = await getFirstEvolution(species);
-        let abilities = await getAbilities(pokemon);
+            let types = getTypes(pokemon);
+            checkLanguage(allSpecies[i])
 
-        let types = getTypes(pokemon);
-        checkLanguage(allSpecies[i])
+            let url_evolutionChain = species['evolution_chain']['url'];
+            let responseEvolutionChain = await fetch(url_evolutionChain);
+            let responseEvolutionChainAsJson = await responseEvolutionChain.json();
 
-        let url_evolutionChain = species['evolution_chain']['url'];
-        let responseEvolutionChain = await fetch(url_evolutionChain);
-        let responseEvolutionChainAsJson = await responseEvolutionChain.json();
+            let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
 
-        let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
+            for (let e = 0; e < possibleSecondEvolutions.length; e++) {
+                let urlSecondEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['species']['url'];
+                let responseSecondEvolution = await fetch(urlSecondEvolution);
+                let responseSecondEvolutionAsJson = await responseSecondEvolution.json();
+                let idSecondEvolution = responseSecondEvolutionAsJson['id'];
 
-        for (let e = 0; e < possibleSecondEvolutions.length; e++) {
-            let urlSecondEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['species']['url'];
-            let responseSecondEvolution = await fetch(urlSecondEvolution);
-            let responseSecondEvolutionAsJson = await responseSecondEvolution.json();
-            let idSecondEvolution = responseSecondEvolutionAsJson['id'];
+                id_second_evolution.push(idSecondEvolution);
 
-            id_second_evolution.push(idSecondEvolution);
+                let possibleThirdEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'];
 
-            let possibleThirdEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'];
+                for (let f = 0; f < possibleThirdEvolutions.length; f++) {
+                    let urlThirdEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'][f]['species']['url'];
+                    let responseThirdEvolution = await fetch(urlThirdEvolution);
+                    let responseThirdEvolutionAsJson = await responseThirdEvolution.json();
+                    let idThirdEvolution = responseThirdEvolutionAsJson['id'];
 
-            for (let f = 0; f < possibleThirdEvolutions.length; f++) {
-                let urlThirdEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'][f]['species']['url'];
-                let responseThirdEvolution = await fetch(urlThirdEvolution);
-                let responseThirdEvolutionAsJson = await responseThirdEvolution.json();
-                let idThirdEvolution = responseThirdEvolutionAsJson['id'];
-
-                id_third_evolution.push(idThirdEvolution);
+                    id_third_evolution.push(idThirdEvolution);
+                };
             };
+            pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities);
         };
-
-        pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities);
-
-        sortPokemon();
-        pushIdandNameToList();
-        renderPokemonInfo();
-
     };
-
-
+    sortPokemon();
+    pushIdandNameToList();
+    renderPokemonInfo();
 };
-
-
-
 
 
 async function getFirstEvolution(species) {
@@ -222,102 +234,6 @@ function checkLanguage(Species) {
 };
 
 
-
-
-/* async function loadPokemon(start, end) {
-
-    for (let i = start + 1; i < end; i++) {
-
-        if (!listOfIds.includes(i)) {
-
-            let url = `https://pokeapi.co/api/v2/pokemon/${i}`;
-            let response = await fetch(url);
-            let responseAsJson = await response.json();
-
-            let url_description = `https://pokeapi.co/api/v2/pokemon-species/${i}/`;
-            let responseDescription = await fetch(url_description);
-            let responseDescriptionAsJson = await responseDescription.json();
-
-            let url_evolutionChain = responseDescriptionAsJson['evolution_chain']['url'];
-            let responseEvolutionChain = await fetch(url_evolutionChain);
-            let responseEvolutionChainAsJson = await responseEvolutionChain.json();
-
-            let urlFirstEvolution = responseEvolutionChainAsJson['chain']['species']['url'];
-            let responseFirstEvolution = await fetch(urlFirstEvolution);
-            let responseFirstEvolutionAsJson = await responseFirstEvolution.json();
-            let id_first_evolution = responseFirstEvolutionAsJson['id'];
-
-            let name = responseAsJson['forms'][0]['name'];
-            let id = responseAsJson['id'];
-            let img = responseAsJson['sprites']['other']['official-artwork']['front_default'];
-            let hp = responseAsJson['stats'][0]['base_stat'];
-            let attack = responseAsJson['stats'][1]['base_stat'];
-            let defense = responseAsJson['stats'][2]['base_stat'];
-            let special_attack = responseAsJson['stats'][3]['base_stat'];
-            let special_defense = responseAsJson['stats'][4]['base_stat'];
-            let speed = responseAsJson['stats'][5]['base_stat'];
-            let types = [];
-            let id_second_evolution = [];
-            let id_third_evolution = [];
-            let weight = responseAsJson['weight'];
-            let height = responseAsJson['height'];
-            let abilities = [];
-
-
-            // abilities = await getAbilities(responseAsJson['abilities']);
-
-
-
-
-
-            let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
-
-            for (let e = 0; e < possibleSecondEvolutions.length; e++) {
-                let urlSecondEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['species']['url'];
-                let responseSecondEvolution = await fetch(urlSecondEvolution);
-                let responseSecondEvolutionAsJson = await responseSecondEvolution.json();
-                let idSecondEvolution = responseSecondEvolutionAsJson['id'];
-
-                id_second_evolution.push(idSecondEvolution);
-
-                let possibleThirdEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'];
-
-                for (let f = 0; f < possibleThirdEvolutions.length; f++) {
-                    let urlThirdEvolution = responseEvolutionChainAsJson['chain']['evolves_to'][e]['evolves_to'][f]['species']['url'];
-                    let responseThirdEvolution = await fetch(urlThirdEvolution);
-                    let responseThirdEvolutionAsJson = await responseThirdEvolution.json();
-                    let idThirdEvolution = responseThirdEvolutionAsJson['id'];
-
-                    id_third_evolution.push(idThirdEvolution);
-                };
-            };
-
-            checkLanguage(responseDescriptionAsJson);
-
-            for (let t = 0; t < responseAsJson['types'].length; t++) {
-                const element = responseAsJson['types'][t];
-                types.push(element['type']['name']);
-            };
-            pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities);
-        };
-    };
-    sortPokemon();
-    pushIdandNameToList();
-    renderPokemonInfo();
-}; */
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Filterfunktion:
 
 async function searchPokemon() {
@@ -347,7 +263,7 @@ async function searchPokemon() {
     if (listOfIdsFiltered.length > 0) {
         for (let l = 0; l < listOfIdsFiltered.length; l++) {
             const pokemon = listOfIdsFiltered[l];
-            await loadPokemon(pokemon, pokemon + 1);
+            await fillJson(pokemon - 1, pokemon - 1);
         };
     } else {
         const content = document.getElementById('pokedex');
@@ -375,11 +291,8 @@ async function deleteSearch() {
     listOfIds = [];
     listOfIdsFiltered = [];
     loadedPokemons = [];
-    await loadPokemon(start_i, end_i);
+    await fillJson(0, end_i);
 };
-
-
-
 
 
 async function load20More() {
@@ -399,7 +312,7 @@ function toggleLoadButton(time) {
 
 function addLoadButton() {
     document.getElementById('container-button-load-more').innerHTML = /*html*/`
-        <button id="button-load-more" onclick="load20More()" class="btn btn-primary button-load-more">Load more</button>
+        <button id="button-load-more" onclick="load20More()" disabled="true" class="btn btn-primary button-load-more">Load more</button>
     `;
 };
 
@@ -862,8 +775,8 @@ async function randomPokemon() {
     pushIdandNameToList();
     renderPokemonInfo();
     showDetails(id);
-
 };
+
 
 async function randomSecondEvolution(randomNumnber) {
     let array = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_second_evolution'];
@@ -873,6 +786,7 @@ async function randomSecondEvolution(randomNumnber) {
         await fillJson(element - 1, element - 1)
     };
 };
+
 
 async function randomThirdEvolution(randomNumnber) {
     let array = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_third_evolution'];
@@ -893,7 +807,6 @@ async function randomThirdEvolution(randomNumnber) {
 
 /* Test für swipe */
 
-
 document.addEventListener('swiped', function (event) {
     console.log(event.target); // the element that was swiped
     console.log(event.detail.dir); // swiped direction
@@ -906,7 +819,3 @@ document.addEventListener('swiped-left', function (event) {
 document.addEventListener('swiped-right', function (e) {
     console.log(event.target); // the element that was swiped
 });
-
-
-
-

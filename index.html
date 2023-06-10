@@ -22,15 +22,15 @@
             <h1>Pokédex</h1>
         </div>
         <nav>
-            <button id="random_button" onclick="randomPokemon()" class="word-break btn btn-dark hover-effect">Random
+            <button id="random_button" onclick="randomPokemon()" disabled="true" class="word-break btn btn-dark hover-effect">Random
                 Pokémon</button>
             <form onsubmit="searchPokemon(); return false" class="input-and-buttons">
                 <input id="input_search" required title="Please fill in name or ID"
                     oninvalid="this.setCustomValidity('Enter name or ID')" oninput="setCustomValidity('')"
                     class="input-search" placeholder="Name or ID..." type="text">
                 <div class="left-buttons-nav">
-                    <input type="submit" id="button_search" value="Search" class="btn btn-success hover-effect">
-                    <button type="button" onclick="deleteSearch()" class="btn btn-danger hover-effect">Delete</button>
+                    <input type="submit" id="button_search" disabled="true" value="Search" class="btn btn-success hover-effect">
+                    <button id="delete_search" type="button" onclick="deleteSearch()" disabled="true" class="btn btn-danger hover-effect">Delete</button>
                 </div>
             </form>
         </nav>
