@@ -96,6 +96,7 @@ async function getStarted() {
     await renderPokemonInfo();
     toggleLoadButton(0);
     enableButtons();
+    enableTooltips();
 };
 
 
@@ -244,19 +245,19 @@ async function searchPokemon() {
     let search = document.getElementById('input_search').value.toLowerCase();
     listOfIdsFiltered = [];
 
-    for (let f = 0; f < listOfNames.length; f++) {
-        const name = listOfNames[f];
+    for (let f = 0; f < listOfAllNames.length; f++) {
+        const name = listOfAllNames[f];
 
         if (name.includes(search)) {
-            listOfIdsFiltered.push(listOfIds[listOfNames.indexOf(name)]);
+            listOfIdsFiltered.push(allIds[listOfAllNames.indexOf(name)]);
         };
     };
     listOfNames = [];
-    for (let f = 0; f < listOfIds.length; f++) {
-        const number = listOfIds[f];
+    for (let f = 0; f < allIds.length; f++) {
+        const number = allIds[f];
 
         if (number.toString().includes(search)) {
-            listOfIdsFiltered.push(listOfIds[listOfIds.indexOf(number)]);
+            listOfIdsFiltered.push(allIds[allIds.indexOf(number)]);
         };
     }
     listOfIds = [];
@@ -274,6 +275,12 @@ async function searchPokemon() {
             </div>
         `;
     };
+};
+
+
+function enableTooltips() {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 };
 
 
@@ -703,6 +710,8 @@ function doNotClose(event) {
     event.stopPropagation();
 };
 
+
+// Create Canvas for Stats in Details:
 
 function createCanvas(i) {
     const ctx = document.getElementById('myChart');

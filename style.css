@@ -1,3 +1,8 @@
+html {
+    scroll-behavior: smooth;
+}
+
+
 body {
     margin: 0;
     background-color: rgb(162, 162, 162);
@@ -5,7 +10,6 @@ body {
     flex-direction: column;
     align-items: center;
     font-family: sans-serif;
-
 }
 
 header {
@@ -361,6 +365,23 @@ footer {
     width: 90vw;
     display: flex;
     justify-content: center;
+}
+
+.to-start-div {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+}
+
+
+.to-start-img {
+    width: 64px;
+    border-radius: 100%;
+    background-color: rgba(255, 255, 255, 0.684);
+}
+
+.to-start-img:hover {
+    background-color: white;
 }
 
 
