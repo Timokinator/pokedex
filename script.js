@@ -126,14 +126,11 @@ async function fillJson(start, end) {
             let id_third_evolution = [];
             let id_first_evolution = await getFirstEvolution(species);
             let abilities = await getAbilities(pokemon);
-
             let types = getTypes(pokemon);
             checkLanguage(allSpecies[i])
-
             let url_evolutionChain = species['evolution_chain']['url'];
             let responseEvolutionChain = await fetch(url_evolutionChain);
             let responseEvolutionChainAsJson = await responseEvolutionChain.json();
-
             let possibleSecondEvolutions = responseEvolutionChainAsJson['chain']['evolves_to'];
 
             for (let e = 0; e < possibleSecondEvolutions.length; e++) {
@@ -164,7 +161,7 @@ async function fillJson(start, end) {
 };
 
 
-async function getFirstEvolution(species) {
+async function getFirstEvolution(species) { // gets first evolution and return it into an array
     let url_evolutionChain = species['evolution_chain']['url'];
     let responseEvolutionChain = await fetch(url_evolutionChain);
     let responseEvolutionChainAsJson = await responseEvolutionChain.json();
@@ -176,7 +173,7 @@ async function getFirstEvolution(species) {
 };
 
 
-async function getAbilities(pokemon) {
+async function getAbilities(pokemon) { // gets abilities and return them into an Json-array
     let listOfAbilities = [];
     for (let a = 0; a < pokemon['abilities'].length; a++) {
         const element = pokemon['abilities'][a];
@@ -196,7 +193,7 @@ async function getAbilities(pokemon) {
 };
 
 
-function checkLanguageAbilities(responseAsJson) {
+function checkLanguageAbilities(responseAsJson) { // makes sure that abilites are in english
     for (let j = 0; j < responseAsJson['effect_entries'].length; j++) {
         let language = responseAsJson['effect_entries'][j]['language']['name'];
         if (language == 'en') {
@@ -207,7 +204,7 @@ function checkLanguageAbilities(responseAsJson) {
 };
 
 
-function getTypes(pokemon) {
+function getTypes(pokemon) { // gets and return all types from a single pokemon
     let types = [];
     for (let t = 0; t < pokemon['types'].length; t++) {
         const type = pokemon['types'][t];
@@ -217,7 +214,7 @@ function getTypes(pokemon) {
 };
 
 
-function checkLanguage(Species) {
+function checkLanguage(Species) { // makes sure that the description is in english
     for (let j = 0; j < Species['flavor_text_entries'].length; j++) {
         let language = Species['flavor_text_entries'][j]['language']['name'];
         if (language == 'en') {
@@ -228,7 +225,7 @@ function checkLanguage(Species) {
 };
 
 
-// Filterfunktion:
+// Search-function:
 
 async function searchPokemon() {
     toggleLoadButton(0);
@@ -270,7 +267,7 @@ async function searchPokemon() {
 };
 
 
-function enableTooltips() {
+function enableTooltips() { // anebles tooltip on button (go to top of page)
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 };
@@ -283,7 +280,7 @@ function containsOnlyNumbers(str) {
 };
 
 
-async function deleteSearch() {
+async function deleteSearch() { // delete search and render pokemon to previous end_i
     document.getElementById('input_search').value = '';
     document.getElementById("button_search").disabled = false;
     toggleLoadButton(0);
@@ -294,7 +291,7 @@ async function deleteSearch() {
 };
 
 
-async function load20More() {
+async function load20More() { // load/render 20 more pokemon
     toggleLoadButton(0);
     start_i += 20;
     end_i += 20;
@@ -303,27 +300,27 @@ async function load20More() {
 };
 
 
-function toggleLoadButton(time) {
+function toggleLoadButton(time) { // enables/disables load more button
     let button = document.getElementById('button-load-more');
     setTimeout(function () { button.disabled = !button.disabled; }, time);
 };
 
 
-function addLoadButton() {
+function addLoadButton() { // add load more button
     document.getElementById('container-button-load-more').innerHTML = /*html*/`
         <button id="button-load-more" onclick="load20More()" disabled="true" class="btn btn-primary button-load-more">Load more</button>
     `;
 };
 
 
-function sortPokemon() {
+function sortPokemon() { // sorts loaded pokemons ascending
     loadedPokemons.sort(function (a, b) {
         return a.id - b.id;
     });
 };
 
 
-function pushIdandNameToList() {
+function pushIdandNameToList() { // help-function to sort arrays from IDs and names
     listOfNames = [];
     listOfIds = [];
     for (let i = 0; i < loadedPokemons.length; i++) {
@@ -334,6 +331,7 @@ function pushIdandNameToList() {
 };
 
 
+// push loaded informations to Json-Array:
 function pushToJson(i, name, id, img, hp, attack, defense, special_attack, special_defense, speed, weight, height, description, types, id_first_evolution, id_second_evolution, id_third_evolution, abilities) {
     loadedPokemons.push(
         {
@@ -360,7 +358,7 @@ function pushToJson(i, name, id, img, hp, attack, defense, special_attack, speci
 };
 
 
-function renderPokemonInfo() {
+function renderPokemonInfo() { // renders the loaded pokemon
     const content = document.getElementById('pokedex');
     content.innerHTML = '';
     for (let i = 0; i < loadedPokemons.length; i++) {
@@ -382,7 +380,7 @@ function insertTypes(i, id_div) {
 };
 
 
-function showDetails(i) {
+function showDetails(i) { // opens details from clicked pokemon
     closeDetails();
     const content = document.getElementById('singlePokemon');
     content.innerHTML = '';
@@ -407,7 +405,7 @@ function addCloseWithEscape() { //adds the possibility to close the details with
 };
 
 
-function renderAbilities(i) {
+function renderAbilities(i) { //renders abilities in details
     let content = document.getElementById('container_abilities')
     content.innerHTML = '';
     for (let a = 0; a < loadedPokemons[i]['abilities'].length; a++) {
@@ -417,14 +415,14 @@ function renderAbilities(i) {
 };
 
 
-function showDetailsfromEvolution(i) {
+function showDetailsfromEvolution(i) { // 
     closeDetails();
     pushIdandNameToList();
     showDetails(i);
 };
 
 
-async function insertFirstEvolution(i) {
+async function insertFirstEvolution(i) { // insert first evolution on details
     const pokemon = loadedPokemons[i]['id_first_evolution'];
     content_evolution1 = document.getElementById('container_first_evolution');
     content_evolution1.innerHTML = '';
@@ -441,7 +439,7 @@ async function insertFirstEvolution(i) {
 };
 
 
-async function getImagesSecondEvolution(i) {
+async function getImagesSecondEvolution(i) { // insert second evolution(s) on details
     content_evolution2 = document.getElementById('container_second_evolution');
     content_evolution2.innerHTML = '';
     const pokemon = loadedPokemons[i]['id_second_evolution'];
@@ -473,7 +471,7 @@ async function getImagesSecondEvolution(i) {
 };
 
 
-async function getImagesThirdEvolution(i) {
+async function getImagesThirdEvolution(i) { // insert third evolution(s) on details
     content_evolution3 = document.getElementById('container_third_evolution');
     content_evolution3.innerHTML = '';
     const pokemon = loadedPokemons[i]['id_third_evolution'];
@@ -537,21 +535,18 @@ function doNotClose(event) {
 
 function createCanvas(i) {
     const ctx = document.getElementById('myChart');
-
     let hp = loadedPokemons[i]['hp'];
     let attack = loadedPokemons[i]['attack'];
     let defense = loadedPokemons[i]['defense'];
     let special_attack = loadedPokemons[i]['special_attack'];
     let special_defense = loadedPokemons[i]['special_defense'];
     let speed = loadedPokemons[i]['speed'];
-
     newChart(ctx, hp, attack, defense, special_attack, special_defense, speed);
 };
 
 
 function newChart(ctx, hp, attack, defense, special_attack, special_defense, speed) {
     Chart.defaults.font.size = 10;
-
     new Chart(ctx, {
         type: 'bar',
         data: {
@@ -596,7 +591,7 @@ async function randomPokemon() {
     let randomNumnber = Math.floor(Math.random() * 1000);
     await fillJson(randomNumnber - 1, randomNumnber - 1);
 
-    let toLoad = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_first_evolution']; //noch prüfen ob random bereits erste evolution
+    let toLoad = loadedPokemons[listOfIds.indexOf(randomNumnber)]['id_first_evolution'];
     await fillJson(toLoad - 1, toLoad - 1);
 
     await randomSecondEvolution(randomNumnber);
