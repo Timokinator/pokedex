@@ -31,6 +31,8 @@ let evolutionChain = [];
 let allIds = [];
 let start_i = 0;
 let end_i = 20;
+let loading;
+
 
 
 function fillAllIds() { // Function to load ALL IDs 
@@ -87,16 +89,33 @@ async function getAllEvolution() { // load all Evolution from API at once
 
 
 async function getStarted() { // onload page
+    loading = true;
+    toggleLoadingScreen();
     await fillAllIds();
     await fillAllPokemon();
     await fillAllNames();
     await getAllSpecies();
     await fillJson(start_i, end_i);
     await renderPokemonInfo();
+    loading=false;
+    toggleLoadingScreen();
     toggleLoadButton(0);
     enableButtons();
     enableTooltips();
 };
+
+function toggleLoadingScreen() {
+    const loadingScreen = document.getElementById('loading_screen');
+
+    if (loading == true) {
+        loadingScreen.classList.remove('d-none');
+    } else {
+        loadingScreen.classList.add('d-none');
+    }
+
+}
+
+
 
 
 function enableButtons() { // enable buttons AFTER page is loaded
@@ -464,7 +483,7 @@ async function getImagesSecondEvolution(i) { // insert second evolution(s) on de
         content_evolution2.innerHTML += /*html*/`
          <div class="container-no-evolution">
              <p class="no-evolution-p">No evolution</p>
-             <img class="img-no-evolution" src="./img/no-evolution.png" alt="">
+             <img class="img-no-evolution" src="img/no-evolution.png" alt="">
          </div>    
      `;
     };
